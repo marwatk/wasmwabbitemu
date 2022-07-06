@@ -8,10 +8,6 @@
 #endif
 #include "lcd.h"
 #include "gifhandle.h"
-#ifdef WINVER
-#include "fileutilities.h"
-#endif
-
 
 TCHAR *generate_gif_name(TCHAR *fn, int num, TCHAR *dest) {
 	size_t i;

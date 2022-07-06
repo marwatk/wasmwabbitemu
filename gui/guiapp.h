@@ -37,8 +37,6 @@ private:
 	ParsedCmdArgs_t parsedArgs;
 	void ParseCommandLineArgs();
 	void LoadCommandlineFiles(INT_PTR,  void (*load_callback)(INT_PTR, LPTSTR, SEND_FLAG));
-public:
-	static BOOL DoRomWizard();
 };
 
 void LoadToLPCALC(INT_PTR lParam, LPTSTR filePath, SEND_FLAG sendLoc);

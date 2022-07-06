@@ -1,7 +1,6 @@
 #include "gui.h"
 #include "guidebug.h"
 #include "guiapp.h"
-#include "wizard/romwizard.h"
 #include "calc.h"
 #include "guiopenfile.h"
 #include "keys.h"
@@ -21,7 +20,6 @@
 
 #include "gif.h"
 #include "gifhandle.h"
-#include "fileutilities.h"
 
 #define BIG_WINDOWS_ICON 0
 #ifndef max
@@ -79,14 +77,12 @@ BEGIN_EVENT_TABLE(WabbitemuFrame, wxFrame)
 	EVT_SIZE(WabbitemuFrame::OnResize)
 	EVT_MENU(ID_File_New, WabbitemuFrame::OnFileNew)
 	EVT_MENU(ID_File_Open, WabbitemuFrame::OnFileOpen)
-	EVT_MENU(ID_File_Save, WabbitemuFrame::OnFileSave)
 	EVT_MENU(ID_File_Close, WabbitemuFrame::OnFileClose)
 	EVT_MENU(ID_File_Gif, WabbitemuFrame::OnFileGIF)
 	EVT_MENU(ID_File_Quit, WabbitemuFrame::OnFileQuit)
 	
 	EVT_MENU(ID_Calc_Pause, WabbitemuFrame::OnPauseEmulation)
 	EVT_MENU(ID_View_Skin, WabbitemuFrame::OnViewSkin)
-	EVT_MENU(ID_View_Vars, WabbitemuFrame::OnViewVariables)
 	EVT_MENU(ID_Speed_Custom, WabbitemuFrame::OnSetSpeedCustom)
 	EVT_MENU(ID_Speed_500, WabbitemuFrame::OnSetSpeed)
 	EVT_MENU(ID_Speed_400, WabbitemuFrame::OnSetSpeed)
@@ -104,7 +100,6 @@ BEGIN_EVENT_TABLE(WabbitemuFrame, wxFrame)
 	EVT_MENU(ID_Debug_Open, WabbitemuFrame::OnDebugOpen)
 	EVT_MENU(ID_Debug_On, WabbitemuFrame::OnDebugOn)
 	
-	EVT_MENU(ID_Help_Setup, WabbitemuFrame::OnHelpSetup)
 	EVT_MENU(ID_Help_Website, WabbitemuFrame::OnHelpWebsite)
 	EVT_MENU(ID_Help_About, WabbitemuFrame::OnHelpAbout)
 	
@@ -601,23 +596,6 @@ All Files (*.*)|*.*\0");
 	}
 }
 
-void WabbitemuFrame::OnFileSave(wxCommandEvent &event) {
-	TCHAR FileName[MAX_PATH];
-	const TCHAR lpstrFilter[] = _T("\
-Known File types ( *.sav; *.rom; *.bin) |*.sav;*.rom;*.bin|\
-Save States  (*.sav)|*.sav|\
-ROMS  (*.rom; .bin)|*.rom;*.bin|\
-All Files (*.*)|*.*\0");
-	if (!SaveFile(FileName, lpstrFilter, _T("Wabbitemu Save State"), _T(".sav"))) {
-		return;
-	}	
-	SAVESTATE_t* save = SaveSlot(lpCalc);
-
-	_tcscpy(save->author, _T("Default"));
-	save->comment[0] = '\0';
-	WriteSave(FileName, save, false);
-}
-
 void WabbitemuFrame::OnFileClose(wxCommandEvent &event) {
 	Close(TRUE);
 }
@@ -900,18 +878,6 @@ void WabbitemuFrame::OnViewSkin(wxCommandEvent& event)
 	this->Update();
 }
 
-void WabbitemuFrame::OnViewVariables(wxCommandEvent & WXUNUSED(event))
-{
-	wxWindow *foundWindow = wxWindow::FindWindowByName(_T("Calculator Variables"), this);
-	if (foundWindow && foundWindow == varTree) {
-		varTree->Show();
-		varTree->SetFocus();
-	} else {
-		varTree = new VarTree(this);
-		varTree->Show();
-	}
-}
-
 void WabbitemuFrame::OnDebugOpen(wxCommandEvent& WXUNUSED(event))
 {
 	gui_debug(lpCalc);
@@ -925,15 +891,6 @@ void WabbitemuFrame::OnDebugReset(wxCommandEvent& WXUNUSED(event))
 void WabbitemuFrame::OnDebugOn(wxCommandEvent& WXUNUSED(event))
 {
 	calc_turn_on(lpCalc);
-}
-
-void WabbitemuFrame::OnHelpSetup(wxCommandEvent& WXUNUSED(event))
-{
-	int count = calc_count();
-	bool success = WabbitemuApp::DoRomWizard();
-	if (!success) {
-		return;
-	}
 }
 
 void WabbitemuFrame::OnHelpWebsite(wxCommandEvent& WXUNUSED(event))

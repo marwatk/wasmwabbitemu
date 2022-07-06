@@ -20,7 +20,6 @@
 #include "CCalcAddress.h"
 #include "CPage.h"
 #include "exportvar.h"
-#include "guiwizard.h"
 #include "guibuttons.h"
 #endif
 

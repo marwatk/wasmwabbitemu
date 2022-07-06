@@ -1,15 +1,8 @@
 #include "guiapp.h"
 #include "gui.h"
-#include "wizard/romwizard.h"
 #include "sendfile.h"
 
 WabbitemuFrame *frames[MAX_CALCS];
-
-BOOL WabbitemuApp::DoRomWizard() {
-	RomWizard wizard;	
-	bool success = wizard.Begin();
-	return success;
-}
 
 void WabbitemuApp::LoadSettings(LPCALC lpCalc)
 {
@@ -47,10 +40,7 @@ bool WabbitemuApp::OnInit()
 			}
 		}
 		if (!loadedRom) {
-			bool success = DoRomWizard();
-			if (!success) {
-				return FALSE;
-			}
+			return FALSE;
 		}
 	}
 	LoadCommandlineFiles((INT_PTR) lpCalc, LoadToLPCALC);

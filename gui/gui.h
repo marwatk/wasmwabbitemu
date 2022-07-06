@@ -17,7 +17,6 @@
 
 #include "guilcd.h"
 #include "guiskinwindow.h"
-#include "guivartree.h"
 #include "calc.h"
 
 enum
@@ -42,17 +41,14 @@ protected:
 private:
 	wxWindow *skinWindow;
 	bool is_resizing;
-	VarTree *varTree;
 	//menu items
 	void OnFileQuit(wxCommandEvent& event);
 	void OnFileClose(wxCommandEvent& event);
-	void OnFileSave(wxCommandEvent& event);
 	void OnFileNew(wxCommandEvent& event);
 	void OnFileOpen(wxCommandEvent& event);
 	void OnFileGIF(wxCommandEvent& event);
     
 	void OnViewSkin(wxCommandEvent& event);
-	void OnViewVariables(wxCommandEvent& event);
 	void OnPauseEmulation(wxCommandEvent& event);
 	void OnTurnCalcOn(wxCommandEvent& event);
 	
@@ -64,7 +60,6 @@ private:
 	void OnDebugOpen(wxCommandEvent& event);
 	void OnDebugOn(wxCommandEvent& event);
 	
-	void OnHelpSetup(wxCommandEvent& event);
 	void OnHelpWebsite(wxCommandEvent& event);
 	void OnHelpAbout(wxCommandEvent& event);
 	
