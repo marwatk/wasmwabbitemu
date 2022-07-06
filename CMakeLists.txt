@@ -55,7 +55,6 @@ add_executable(wxWabbitemu
 	#[[ wxWidgets GUI ]]
 	gui/gui.cpp #[[ This requires gui/gui.h ]]
 	gui/guiapp.cpp #[[ This requires gui/guiapp.h ]]
-	gui/guiskinwindow.cpp #[[ This requires gui/guiskinwindow.h ]]
 	gui/guilcd.cpp #[[ This requires gui/guilcd.h ]]
 	gui/guivartree.cpp #[[ This requires gui/guivartree.h ]]
 	gui/droptarget.cpp #[[ This requires gui/droptarget.h ]]

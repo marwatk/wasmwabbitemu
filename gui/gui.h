@@ -16,7 +16,6 @@
 #endif
 
 #include "guilcd.h"
-#include "guiskinwindow.h"
 #include "calc.h"
 
 enum
@@ -39,7 +38,6 @@ public:
 protected:
 	DECLARE_EVENT_TABLE()
 private:
-	wxWindow *skinWindow;
 	bool is_resizing;
 	//menu items
 	void OnFileQuit(wxCommandEvent& event);
@@ -57,7 +55,6 @@ private:
 	void OnSetSize(wxCommandEvent& event);
 	
 	void OnDebugReset(wxCommandEvent& event);
-	void OnDebugOpen(wxCommandEvent& event);
 	void OnDebugOn(wxCommandEvent& event);
 	
 	void OnHelpWebsite(wxCommandEvent& event);
@@ -81,6 +78,5 @@ private:
 	void FinalizeButtons();
 };
 int SetGIFName();
-void gui_debug(LPCALC lpCalc);
 WabbitemuFrame* gui_frame(LPCALC lpCalc);
 #endif

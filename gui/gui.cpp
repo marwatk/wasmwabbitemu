@@ -1,5 +1,4 @@
 #include "gui.h"
-#include "guidebug.h"
 #include "guiapp.h"
 #include "calc.h"
 #include "guiopenfile.h"
@@ -97,7 +96,6 @@ BEGIN_EVENT_TABLE(WabbitemuFrame, wxFrame)
 	EVT_MENU(ID_Size_400, WabbitemuFrame::OnSetSize)
 	
 	EVT_MENU(ID_Debug_Reset, WabbitemuFrame::OnDebugReset)
-	EVT_MENU(ID_Debug_Open, WabbitemuFrame::OnDebugOpen)
 	EVT_MENU(ID_Debug_On, WabbitemuFrame::OnDebugOn)
 	
 	EVT_MENU(ID_Help_Website, WabbitemuFrame::OnHelpWebsite)
@@ -116,18 +114,6 @@ IMPLEMENT_APP(WabbitemuApp)
 inline wxBitmap wxGetBitmapFromMemory(const unsigned char *data, int length) {
    wxMemoryInputStream is(data, length);
    return wxBitmap(wxImage(is, wxBITMAP_TYPE_PNG, -1), -1);
-}
-
-void gui_debug(LPCALC lpCalc) {
-	wxWindow *oldDebugger = wxWindow::FindWindowById(wxDEBUGGERID);
-	if (oldDebugger) {
-		oldDebugger->Show();
-		return;
-	}
-	lpCalc->running = FALSE;
-	calc_pause_linked();
-	WabbitemuDebugger *debugger = new WabbitemuDebugger(NULL, lpCalc);
-	debugger->Show();
 }
 
 int WabbitemuFrame::gui_draw() {
@@ -164,7 +150,6 @@ WabbitemuFrame * gui_frame(LPCALC lpCalc) {
 	}
 	
 	lpCalc->running = TRUE;
-	lpCalc->breakpoint_callback = gui_debug;
 	mainFrame->SetSpeed(100);
 	
 	mainFrame->Center();   //Centres the frame
@@ -296,7 +281,6 @@ void WabbitemuFrame::gui_frame_update() {
 WabbitemuFrame::WabbitemuFrame(LPCALC lpCalc) : wxFrame(NULL, wxID_ANY, wxT("Wabbitemu"))
 {
 	this->lpCalc = lpCalc;
-	this->skinWindow = new SkinWindow(this, lpCalc);
 	
 	this->SetWindowStyleFlag(wxBORDER_RAISED);
 	wxSize skinSize(350, 725);
@@ -876,11 +860,6 @@ void WabbitemuFrame::OnViewSkin(wxCommandEvent& event)
 	gui_frame_update();
 	this->Refresh();
 	this->Update();
-}
-
-void WabbitemuFrame::OnDebugOpen(wxCommandEvent& WXUNUSED(event))
-{
-	gui_debug(lpCalc);
 }
 
 void WabbitemuFrame::OnDebugReset(wxCommandEvent& WXUNUSED(event))

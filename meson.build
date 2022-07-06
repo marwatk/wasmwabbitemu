@@ -71,14 +71,8 @@ wxWabbitemu_exe = executable('wxWabbitemu',
 	# wxWidgets GUI
 	'gui/gui.cpp',                   # This requires ../gui/gui.h
 	'gui/guiapp.cpp',                # This requires ../gui/guiapp.h
-	'gui/guiskinwindow.cpp',         # This requires ../gui/guiskinwindow.h
 	'gui/guilcd.cpp',                # This requires ../gui/guilcd.h
-	'gui/guivartree.cpp',            # This requires ../gui/guivartree.h
 	'gui/droptarget.cpp',            # This requires ../gui/droptarget.h
-	'gui/wizard/wizardstart.cpp',    # This requires ../gui/wizard/wizardstart.h
-	'gui/wizard/wizardcalctype.cpp', # This requires ../gui/wizard/wizardcalctype.h
-	'gui/wizard/wizardos.cpp',       # This requires ../gui/wizard/wizardos.h
-	'gui/wizard/romwizard.cpp',      # This requires ../gui/wizard/romwizard.h
 	'debugger/guidebug.cpp',         # This requires ../debugger/guidebug.h
 	
 	# Debugger and debugger GUI
