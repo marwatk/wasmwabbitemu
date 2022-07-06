@@ -72,7 +72,6 @@ wxWabbitemu_exe = executable('wxWabbitemu',
 	'gui/gui.cpp',                   # This requires ../gui/gui.h
 	'gui/guiapp.cpp',                # This requires ../gui/guiapp.h
 	'gui/guilcd.cpp',                # This requires ../gui/guilcd.h
-	'gui/droptarget.cpp',            # This requires ../gui/droptarget.h
 	'debugger/guidebug.cpp',         # This requires ../debugger/guidebug.h
 	
 	# Debugger and debugger GUI

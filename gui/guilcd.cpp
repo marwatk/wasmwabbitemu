@@ -1,7 +1,6 @@
 #include "guilcd.h"
 #include "gui.h"
 #include "core.h"
-#include "droptarget.h"
 
 BEGIN_EVENT_TABLE(WabbitemuLCD, wxWindow)
 	EVT_PAINT(WabbitemuLCD::OnPaint)
@@ -19,7 +18,6 @@ WabbitemuLCD::WabbitemuLCD(wxFrame *mainFrame, LPCALC lpCalc)
 	: wxWindow(mainFrame, ID_LCD, wxPoint(0,0), lpCalc->LCDRect.GetSize()) {
 	this->lpCalc = lpCalc;
 	this->mainFrame = mainFrame;
-	this->SetDropTarget(new DnDFile(this, lpCalc));
 #define LCD_HIGH	255
 	for (int i = 0; i <= MAX_SHADES; i++) {
 		redColors[i] = (0x9E*(256-(LCD_HIGH/MAX_SHADES)*i))/255;

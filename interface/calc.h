@@ -15,7 +15,6 @@
 #ifdef _WINDOWS
 #include "Wabbitemu_h.h"
 #include "sound.h"
-#include "DropTarget.h"
 #include "dbbreakpoints.h"
 #endif
 
@@ -73,7 +72,6 @@ typedef struct tagCALC {
 #endif
 
 #ifdef WINVER
-	CDropTarget *pDropTarget;
 	HWND hwndFrame;
 	HWND hwndLCD;
 	HWND hwndDetachedFrame;

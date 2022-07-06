@@ -63,7 +63,6 @@ dofile "use_wxwidgets.lua"
 				"../gui/gui.cpp", -- This requires ../gui/gui.h
 				"../gui/guiapp.cpp", -- This requires ../gui/guiapp.h
 				"../gui/guilcd.cpp", -- This requires ../gui/guilcd.h
-				"../gui/droptarget.cpp", -- This requires ../gui/droptarget.h
 			}
 
 newaction {
