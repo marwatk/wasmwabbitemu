@@ -50,19 +50,7 @@ bool WabbitemuApp::OnInit()
 	return TRUE;
 }
 
-void WabbitemuApp::SaveSettings(LPCALC lpCalc) {
-#ifdef _UNICODE
-	wxString rom_path(lpCalc->rom_path, wxConvUTF8);
-#else
-	wxString rom_path(lpCalc->rom_path);
-#endif
-	settingsConfig->Write(wxT("rom_path"), rom_path);
-	settingsConfig->Write(wxT("SkinEnabled"), lpCalc->SkinEnabled);
-	settingsConfig->Flush();
-}
-
 int WabbitemuApp::OnExit() {
-	SaveSettings(&calcs[0]);
 	//load ROMs first
 	for (int i = 0; i < parsedArgs.num_rom_files; i++) {
 		free(parsedArgs.rom_files[i]);
