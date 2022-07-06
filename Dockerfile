@@ -22,10 +22,12 @@ RUN set -ex; \
     ./emsdk activate latest; \
     : ;
 
-ENV PATH="/opt/emsdk:/opt/emsdk/node/14.18.2_64bit/bin:/opt/emsdk/upstream/emscripten:$PATH"
-ENV EMSDK=/opt/emsdk
-ENV EM_CONFIG=/opt/emsdk/.emscripten
-ENV EMSDK_NODE=/opt/emsdk/node/14.18.2_64bit/bin/node
+
+
+#ENV PATH="/opt/emsdk:/opt/emsdk/node/14.18.2_64bit/bin:/opt/emsdk/upstream/emscripten:$PATH"
+#ENV EMSDK=/opt/emsdk
+#ENV EM_CONFIG=/opt/emsdk/.emscripten
+#ENV EMSDK_NODE=/opt/emsdk/node/14.18.2_64bit/bin/node
 
 RUN set -ex; \
     mkdir -p /opt/src; \
@@ -33,8 +35,25 @@ RUN set -ex; \
 
 WORKDIR /opt/src
 
-COPY . /opt/src/
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential wx*
 
-#RUN set -ex; \
-#    make; \
-#    : ;
+COPY . /opt/src/
+RUN set -ex; \
+    make -j4; \
+    : ;
+
+RUN apt-get install -y tightvncserver
+
+ENV USER=root
+
+RUN set -ex; \
+    mkdir -p /root/.vnc; \
+    echo -n password | vncpasswd -f > /root/.vnc/passwd; \
+    chmod 600 /root/.vnc/passwd; \
+    : ;
+
+ENV DISPLAY=:1
+ENV HOME=/root
+
+
+CMD ["bash", "-c", "tightvncserver; DISPLAY=:1 bin/wxWabbitemu z.rom"]
