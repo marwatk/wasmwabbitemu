@@ -254,198 +254,14 @@ WabbitemuFrame::WabbitemuFrame(LPCALC lpCalc) : wxFrame(NULL, wxID_ANY, wxT("Wab
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 
 	wxMenuBar *m_menubar = new wxMenuBar( 0 );
-	wxMenu *m_fileMenu = new wxMenu();	
-	wxMenuItem* m_newMenuItem;
-	m_newMenuItem = new wxMenuItem( m_fileMenu, ID_File_New, wxString( wxT("New") ) + wxT('\t') + wxT("CTRL+N"), wxEmptyString, wxITEM_NORMAL );
-	m_fileMenu->Append( m_newMenuItem );
-	
-	wxMenuItem* m_openMenuItem;
-	m_openMenuItem = new wxMenuItem( m_fileMenu, ID_File_Open, wxString( wxT("Open...") ) + wxT('\t') + wxT("CTRL+O"), wxEmptyString, wxITEM_NORMAL );
-	m_fileMenu->Append( m_openMenuItem );
-	
-	wxMenuItem* m_saveMenuItem;
-	m_saveMenuItem = new wxMenuItem( m_fileMenu, ID_File_Save, wxString( wxT("Save State...") ) , wxEmptyString, wxITEM_NORMAL );
-	m_fileMenu->Append( m_saveMenuItem );
-	
-	wxMenuItem* m_separator1;
-	m_separator1 = m_fileMenu->AppendSeparator();
-	
-	wxMenuItem* m_gifMenuItem;
-	m_gifMenuItem = new wxMenuItem( m_fileMenu, ID_File_Gif, wxString( wxT("Record GIF") ) + wxT('\t') + wxT("Backspace"), wxEmptyString, wxITEM_NORMAL );
-	m_fileMenu->Append( m_gifMenuItem );
-	
-	wxMenuItem* m_separator2;
-	m_separator2 = m_fileMenu->AppendSeparator();
-	
-	wxMenuItem* m_closeMenuItem;
-	m_closeMenuItem = new wxMenuItem( m_fileMenu, ID_File_Close, wxString( wxT("Close") ) + wxT('\t') + wxT("CTRL+W"), wxEmptyString, wxITEM_NORMAL );
-	m_fileMenu->Append( m_closeMenuItem );
-	
-	wxMenuItem* m_exitMenuItem;
-	m_exitMenuItem = new wxMenuItem( m_fileMenu, ID_File_Quit, wxString( wxT("Exit") ) + wxT('\t') + wxT("ALT+F4"), wxEmptyString, wxITEM_NORMAL );
-	m_fileMenu->Append( m_exitMenuItem );
-	
-	m_menubar->Append( m_fileMenu, wxT("File") );
-	
-	wxMenu *m_viewMenu = new wxMenu();
-	
-	wxMenuItem* m_skinMenuItem;
-	m_skinMenuItem = new wxMenuItem( m_viewMenu, ID_View_Skin, wxString( wxT("Enable Skin") ) , wxEmptyString, wxITEM_CHECK );
-	m_viewMenu->Append( m_skinMenuItem );
-	
-	wxMenuItem* m_variablesMenuItem;
-	m_variablesMenuItem = new wxMenuItem( m_viewMenu, ID_View_Vars, wxString( wxT("Variables")), wxEmptyString, wxITEM_NORMAL );
-	m_viewMenu->Append( m_variablesMenuItem );this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
-	m_menubar->Append( m_viewMenu, wxT("View") );
-	
-	wxMenu *m_calcMenu = new wxMenu();	
-	wxMenuItem* m_soundMenuItem;
-	m_soundMenuItem = new wxMenuItem( m_calcMenu, ID_Calc_Sound, wxString( wxT("Enable Sound") ) , wxEmptyString, wxITEM_CHECK );
-	m_calcMenu->Append( m_soundMenuItem );
-	
-	wxMenuItem* m_separator3;
-	m_separator3 = m_calcMenu->AppendSeparator();
-	
-	wxMenuItem* m_copyMenuItem;
-	m_copyMenuItem = new wxMenuItem( m_viewMenu, ID_Calc_Copy, wxString( wxT("Copy last answer") ) + wxT('\t') + wxT("CTRL+C"), wxEmptyString, wxITEM_NORMAL );
-	m_calcMenu->Append( m_copyMenuItem );
-	
-	wxMenuItem* m_separator4;
-	m_separator4 = m_calcMenu->AppendSeparator();
-	
-	wxMenu *m_speedMenu = new wxMenu();
-	m_calcMenu->Append( -1, wxT("Speed"), m_speedMenu );
-	
-	wxMenuItem* m_pauseMenuItem;
-	m_pauseMenuItem = new wxMenuItem( m_speedMenu, ID_Calc_Pause, wxString( wxT("Pause Emulation") ) , wxEmptyString, wxITEM_CHECK );
-	m_speedMenu->Append( m_pauseMenuItem );
-	
-	wxMenuItem* m_setSpeed500;
-	m_setSpeed500 = new wxMenuItem( m_speedMenu, ID_Speed_500, wxString( wxT("500%") ) , wxEmptyString, wxITEM_CHECK );
-	m_speedMenu->Append( m_setSpeed500 );
-	
-	wxMenuItem* m_setSpeed400;
-	m_setSpeed400 = new wxMenuItem( m_speedMenu, ID_Speed_400, wxString( wxT("400%") ) , wxEmptyString, wxITEM_CHECK );
-	m_speedMenu->Append( m_setSpeed400 );
-	
-	wxMenuItem* m_setSpeed200;
-	m_setSpeed200 = new wxMenuItem( m_speedMenu, ID_Speed_200, wxString( wxT("200%") ) , wxEmptyString, wxITEM_CHECK );
-	m_speedMenu->Append( m_setSpeed200 );
-	
-	wxMenuItem* m_setSpeed100;
-	m_setSpeed100 = new wxMenuItem( m_speedMenu, ID_Speed_100, wxString( wxT("100%") ) , wxEmptyString, wxITEM_CHECK );
-	m_speedMenu->Append( m_setSpeed100 );
-	
-	wxMenuItem* m_setSpeed50;
-	m_setSpeed50 = new wxMenuItem( m_speedMenu, ID_Speed_50, wxString( wxT("50%") ) , wxEmptyString, wxITEM_CHECK );
-	m_speedMenu->Append( m_setSpeed50 );
-	
-	wxMenuItem* m_setSpeed25;
-	m_setSpeed25 = new wxMenuItem( m_speedMenu, ID_Speed_25, wxString( wxT("25%") ) , wxEmptyString, wxITEM_CHECK );
-	m_speedMenu->Append( m_setSpeed25 );
-	
-	wxMenuItem* m_separatorSpeedCustom;
-	m_separatorSpeedCustom = m_speedMenu->AppendSeparator();
-	
-	wxMenuItem* m_setSpeedCustom;
-	m_setSpeedCustom = new wxMenuItem( m_speedMenu, ID_Speed_Custom, wxString( wxT("Custom...") ) , wxEmptyString, wxITEM_CHECK );
-	m_speedMenu->Append( m_setSpeedCustom );
-	
-	wxMenu *m_sizeMenu = new wxMenu();
-	m_calcMenu->Append(-1,wxT("Size"), m_sizeMenu);
-	
-	wxMenuItem* m_setSize100;
-	m_setSize100 = new wxMenuItem( m_sizeMenu, ID_Size_100, wxString( wxT("100%") ) , wxEmptyString, wxITEM_CHECK );
-	m_sizeMenu->Append( m_setSize100 );
-	
-	wxMenuItem* m_setSize200;
-	m_setSize200 = new wxMenuItem( m_sizeMenu, ID_Size_200, wxString( wxT("200%") ) , wxEmptyString, wxITEM_CHECK );
-	m_sizeMenu->Append( m_setSize200 );
-	
-	wxMenuItem* m_setSize300;
-	m_setSize300 = new wxMenuItem( m_sizeMenu, ID_Size_300, wxString( wxT("300%") ) , wxEmptyString, wxITEM_CHECK );
-	m_sizeMenu->Append( m_setSize300 );
-	
-	wxMenuItem* m_setSize400;
-	m_setSize400 = new wxMenuItem( m_sizeMenu, ID_Size_400, wxString( wxT("400%") ) , wxEmptyString, wxITEM_CHECK );
-	m_sizeMenu->Append( m_setSize400 );
-	
-	wxMenuItem* m_separator5;
-	m_separator5 = m_calcMenu->AppendSeparator();
-	
-	wxMenuItem* m_connectMenuItem;
-	m_connectMenuItem = new wxMenuItem( m_calcMenu, ID_Calc_Connect, wxString( wxT("Connect To...") ) , wxEmptyString, wxITEM_NORMAL );
-	m_calcMenu->Append( m_connectMenuItem );
-	
-	wxMenuItem* m_separator6;
-	m_separator6 = m_calcMenu->AppendSeparator();
-	
-	wxMenuItem* m_optionsMenuItem;
-	m_optionsMenuItem = new wxMenuItem( m_calcMenu, ID_Calc_Options, wxString( wxT("Preferences\tCtrl+Q") ) , wxEmptyString, wxITEM_NORMAL );
-	m_calcMenu->Append( m_optionsMenuItem );
-	
-	m_menubar->Append( m_calcMenu, wxT("Calculator") );
-	
-	wxMenu *m_debugMenu = new wxMenu();
-	wxMenuItem* m_resetMenuItem;
-	m_resetMenuItem = new wxMenuItem( m_debugMenu, ID_Debug_Reset, wxString( wxT("Reset") ) , wxEmptyString, wxITEM_NORMAL );
-	m_debugMenu->Append( m_resetMenuItem );
-	
-	wxMenuItem* m_debugMenuItem;
-	m_debugMenuItem = new wxMenuItem( m_debugMenu, ID_Debug_Open, wxString( wxT("Open Debugger...") ) , wxEmptyString, wxITEM_NORMAL );
-	m_debugMenu->Append( m_debugMenuItem );
-	
-	wxMenuItem* m_onMenuItem;
-	m_onMenuItem = new wxMenuItem( m_debugMenu, ID_Debug_On, wxString( wxT("Turn Calc On") ) , wxEmptyString, wxITEM_NORMAL );
-	m_debugMenu->Append( m_onMenuItem );
-	
-	m_menubar->Append( m_debugMenu, wxT("Debug") );
-	
-	wxMenu *m_helpMenu = new wxMenu();
-	wxMenuItem* m_setupMenuItem;
-	m_setupMenuItem = new wxMenuItem( m_helpMenu, ID_Help_Setup, wxString( wxT("Re-run setup wizard") ) , wxEmptyString, wxITEM_NORMAL );
-	m_helpMenu->Append( m_setupMenuItem );
-	
-	wxMenuItem* m_websiteMenuItem;
-	m_websiteMenuItem = new wxMenuItem( m_helpMenu, ID_Help_Website, wxString( wxT("Website") ) , wxEmptyString, wxITEM_NORMAL );
-	m_helpMenu->Append( m_websiteMenuItem );
-	
-	wxMenuItem* m_aboutMenuItem;
-	m_aboutMenuItem = new wxMenuItem( m_helpMenu, ID_Help_About, wxString( wxT("About") ) , wxEmptyString, wxITEM_NORMAL );
-	m_helpMenu->Append( m_aboutMenuItem );
-
-	
-	m_menubar->Append( m_helpMenu, wxT("Help") );
-	
-	this->SetMenuBar( m_menubar );
-	
-	wxStatusBar *m_statusBar1 = new wxStatusBar(this);
-	this->SetStatusBar(m_statusBar1);
-	
-	//Speed starts at 100%
-	m_menubar->Check(ID_Speed_100, true);
-	//Size starts at 200%
-	m_menubar->Check(ID_Size_200, true);
-	
-	if (lpCalc->SkinEnabled) {
-		windowSize = lpCalc->SkinSize;
-	} else {
-		windowSize.Set(128 * scale, 64 * scale);
-	}
-	
-	#if (defined(__WXMSW__) && BIG_WINDOWS_ICON == 1)
-	wxBitmap bitmap(wxT("wabbiticon.png"), wxBITMAP_TYPE_PNG);
-	icon.CopyFromBitmap(bitmap);
-	#else
-	wxIcon icon = wxIcon(wxICON(wabbiticon));
-	#endif
-	
-	this->SetIcon(icon);
+		
+	windowSize.Set(128 * scale, 64 * scale);
 	
 	this->Connect(wxEVT_SHOW, (wxObjectEventFunction) &WabbitemuFrame::OnShow);
 	
 	this->SetSize(windowSize);
+
+
 }
 
 void WabbitemuFrame::OnShow(wxShowEvent& event) {
@@ -619,23 +435,13 @@ void WabbitemuFrame::OnPauseEmulation(wxCommandEvent &event) {
 void WabbitemuFrame::SetSpeed(int speed) {
 	lpCalc->speed = speed;
 }
-
-void WabbitemuFrame::OnKeyDown(wxKeyEvent& event)
+void WabbitemuFrame::keyDown(int keycode)
 {
-	int keycode = event.GetKeyCode();
 	if (keycode == WXK_F8) {
 		if (lpCalc->speed == 100) {
 			SetSpeed(400);
 		} else {
 			SetSpeed(100);
-		}
-	}
-	if (keycode == WXK_SHIFT) {
-		wxUint32 raw = event.GetRawKeyCode();
-		if (raw == 65505) {
-			keycode = WXK_LSHIFT;
-		} else {
-			keycode = WXK_RSHIFT;
 		}
 	}
 
@@ -650,9 +456,15 @@ void WabbitemuFrame::OnKeyDown(wxKeyEvent& event)
 	}
 }
 
-void WabbitemuFrame::OnKeyUp(wxKeyEvent& event)
+void WabbitemuFrame::OnKeyDown(wxKeyEvent& event)
 {
-	int key = event.GetKeyCode();
+	std::cout << "gui KeyDown\n";
+	int keycode = event.GetKeyCode();
+	this->keyDown(keycode);
+}
+
+void WabbitemuFrame::keyUp(int key)
+{
 	if (key == WXK_SHIFT) {
 		keypad_key_release(&lpCalc->cpu, WXK_LSHIFT);
 		keypad_key_release(&lpCalc->cpu, WXK_RSHIFT);
@@ -660,6 +472,12 @@ void WabbitemuFrame::OnKeyUp(wxKeyEvent& event)
 		keypad_key_release(&lpCalc->cpu, key);
 	}
 	FinalizeButtons();
+}
+
+void WabbitemuFrame::OnKeyUp(wxKeyEvent& event)
+{
+	int key = event.GetKeyCode();
+	this->keyUp(key);
 }
 
 void WabbitemuFrame::OnLeftButtonDown(wxMouseEvent& event)
@@ -746,6 +564,7 @@ void WabbitemuFrame::OnLeftButtonUp(wxMouseEvent& event)
 
 void WabbitemuFrame::OnQuit(wxCloseEvent& event)
 {
+
 	lpCalc->active = FALSE;
 	event.Skip();
 }

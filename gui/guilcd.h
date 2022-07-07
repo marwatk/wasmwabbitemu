@@ -9,6 +9,8 @@
 #include "lcd.h"
 #include <stdlib.h>
 
+#include <SDL.h>
+
 void SaveStateDialog(LPCALC lpCalc);
 #define MAX_SHADES 255
 class WabbitemuLCD: public wxWindow

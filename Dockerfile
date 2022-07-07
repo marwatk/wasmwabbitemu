@@ -38,6 +38,7 @@ WORKDIR /opt/src
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential wx*
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libsdl2-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y x11-xserver-utils
 
 COPY . /opt/src/
 RUN set -ex; \

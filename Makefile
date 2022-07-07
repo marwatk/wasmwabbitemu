@@ -9,7 +9,6 @@ BINDIR = $(PREFIX)/bin
 
 # Wildcard rule
 .DEFAULT:
-	@$(MAKE) -s -C premake
 	$(MAKE) -C build $@
 
 all: bin/wxWabbitemu

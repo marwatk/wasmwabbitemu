@@ -25,6 +25,7 @@ WabbitemuLCD::WabbitemuLCD(wxFrame *mainFrame, LPCALC lpCalc)
 		blueColors[i] = (0x88*(256-(LCD_HIGH/MAX_SHADES)*i))/255;
 	}
 	hasDrawnLCD = false;
+
 }
 
 void WabbitemuLCD::OnLeftButtonDown(wxMouseEvent& event)
@@ -98,6 +99,7 @@ void WabbitemuLCD::OnResize(wxSizeEvent& event)
 //TODO: forward these events somehow
 void WabbitemuLCD::OnKeyDown(wxKeyEvent& event)
 {
+	std::cout << "lcd KeyDown\n";
 	int keycode = event.GetKeyCode();
 	if (keycode == WXK_F8) {
 		if (lpCalc->speed == 100)
@@ -182,24 +184,7 @@ void WabbitemuLCD::PaintLCD(wxWindow *window, wxPaintDC *wxDCDest)
 		wxImage screenImage(128, 64, rgb_data, true);
 		wxBitmap bmpBuf(screenImage.Size(wxSize(lcd->width, 64), wxPoint(0, 0)).Scale(rc.GetWidth(), rc.GetHeight()));
 		wxMemDC.SelectObject(bmpBuf);
-		//draw drag panes
-		/*if (lpCalc->do_drag == TRUE) {
 
-			hdcOverlay = DrawDragPanes(hwnd, hdcDest, 0);
-			BLENDFUNCTION bf;
-			bf.BlendOp = AC_SRC_OVER;
-			bf.BlendFlags = 0;
-			bf.SourceConstantAlpha = 160;
-			bf.AlphaFormat = 0;
-			if (AlphaBlend(	hdc, 0, 0, rc.right, rc.bottom,
-						hdcOverlay, 0, 0, rc.right, rc.bottom,
-						bf ) == FALSE) printf("alpha blend 1 failed\n");
-
-			DeleteDC(hdcOverlay);
-
-		}*/
-
-		//copy to the screen
 		wxDCDest->Blit(drawPoint.x, drawPoint.y, draw_width, draw_height, &wxMemDC, 0, 0);
 		wxMemDC.SelectObject(wxNullBitmap);
 
@@ -224,36 +209,9 @@ void WabbitemuLCD::PaintLCD(wxWindow *window, wxPaintDC *wxDCDest)
 			rgb_data[j+2] = blueColors[screen[i]];
 		}
 		
-		// std::cout << "\n";
-
-		/*wxImageResizeQuality scalingMode = wxIMAGE_QUALITY_NORMAL;
-		//hiqh quality does bicubic sampling which looks terrible on our image
-		if (lcd->width * lpCalc->scale != rc.GetWidth())
-			scalingMode = wxIMAGE_QUALITY_HIGH;
-		else
-			scalingMode = wxIMAGE_QUALITY_NORMAL;*/
 		wxImage screenImage(128, 64, rgb_data, true);
 		wxBitmap bmpBuf(screenImage.Size(wxSize(lcd->width, 64), wxPoint(0, 0)).Scale(rc.GetWidth(), rc.GetHeight()));
 		wxMemDC.SelectObject(bmpBuf);
-		//if were dragging something we will draw these nice panes
-		/*BLENDFUNCTION bf;
-		bf.BlendOp = AC_SRC_OVER;
-		bf.BlendFlags = 0;
-		bf.SourceConstantAlpha = 160;
-		bf.AlphaFormat = 0;
-
-		if (lpCalc->do_drag == TRUE) {
-
-			hdcOverlay = DrawDragPanes(hwnd, hdcDest, 0);
-
-			if (AlphaBlend(	hdc, 0, 0, rc.right, rc.bottom,
-						hdcOverlay, 0, 0, rc.right, rc.bottom,
-						bf ) == FALSE) printf("alpha blend 1 failed\n");
-
-			DeleteDC(hdcOverlay);
-
-		}*/
-		//finally copy up the screen image
 		wxDCDest->Blit(drawPoint.x, drawPoint.y, draw_width, draw_height, &wxMemDC, 0, 0);
 		//lets give it a texture to look nice
 		wxImage skinTexture = lpCalc->calcSkin.GetSubImage(lpCalc->LCDRect);
@@ -265,4 +223,5 @@ void WabbitemuLCD::PaintLCD(wxWindow *window, wxPaintDC *wxDCDest)
 		wxMemDC.SelectObject(wxNullBitmap);
 
 	}
+
 }

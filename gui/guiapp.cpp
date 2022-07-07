@@ -47,6 +47,13 @@ bool WabbitemuApp::OnInit()
 	timer = new wxTimer();
 	timer->Connect(wxEVT_TIMER, (wxObjectEventFunction) &WabbitemuApp::OnTimer);
 	timer->Start(TPF, false);
+
+	SDL_Init(SDL_INIT_VIDEO);       // Initializing SDL as Video
+	SDL_CreateWindowAndRenderer(400, 400, 0, &window, &renderer);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);      // setting draw color
+	SDL_RenderClear(renderer);      // Clear the newly created window
+	SDL_RenderPresent(renderer);    // Reflects the changes done in the
+
 	return TRUE;
 }
 
@@ -116,6 +123,44 @@ void WabbitemuApp::OnTimer(wxTimerEvent& event) {
 	} else {
 		difference += TPF;
 	}
+
+	SDL_Event e;
+    while (SDL_PollEvent(&e)) {  // poll until all events are handled!
+        std::cout << "Got SDL event\n";
+		if( e.type == SDL_KEYDOWN ) {
+			switch( e.key.keysym.sym )
+			{
+				case SDLK_UP:
+				frames[0]->keyDown(WXK_UP);
+				printf( "UP!\n" );
+				break;
+
+				case SDLK_DOWN:
+				frames[0]->keyDown(WXK_DOWN);
+				printf( "DOWN!\n" );
+				break;
+
+				default:
+				break;
+			}
+		}
+		if( e.type == SDL_KEYUP ) {
+			switch( e.key.keysym.sym )
+			{
+				case SDLK_UP:
+				frames[0]->keyUp(WXK_UP);
+				break;
+
+				case SDLK_DOWN:
+				frames[0]->keyUp(WXK_DOWN);
+				printf( "DOWN!\n" );
+				break;
+
+				default:
+				break;
+			}
+		}
+    }
 }
 
 void WabbitemuApp::ParseCommandLineArgs()
@@ -165,25 +210,6 @@ void WabbitemuApp::ParseCommandLineArgs()
 		}
 	}
 }
-
-/*void LoadAlreadyExistingWabbit(unsigned int lParam, LPTSTR filePath, SEND_FLAG sendLoc)
-{
-	HWND hwnd = (HWND) lParam;
-	COPYDATASTRUCT *cds = (COPYDATASTRUCT *) malloc(sizeof(COPYDATASTRUCT));
-	cds->dwData = sendLoc;
-	size_t strLen;
-	cds->lpData = filePath;
-	if (PathIsRelative(filePath)) {
-		TCHAR tempPath[MAX_PATH];
-		TCHAR *tempPath2 = (TCHAR *) malloc(MAX_PATH);
-		_tgetcwd(tempPath, MAX_PATH);
-		PathCombine(tempPath2, tempPath, filePath);
-		cds->lpData = tempPath2;
-	}
-	StringCbLength(filePath, 512, &strLen);
-	cds->cbData = strLen;
-	SendMessage(hwnd, WM_COPYDATA, (WPARAM) NULL, (LPARAM) cds);
-}*/
 
 void LoadToLPCALC(INT_PTR lParam, LPTSTR filePath, SEND_FLAG sendLoc)
 {

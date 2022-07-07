@@ -3,8 +3,6 @@
 #ifndef GUI_WX_H
 #define GUI_WX_H
 
-//#include <SDL.h>
-
 #include <wx/statusbr.h>
 #include <wx/frame.h>
 #include <wx/numdlg.h>
@@ -31,6 +29,9 @@ public:
     WabbitemuFrame(LPCALC);
    	wxWindow *wxLCD;
     
+	void keyDown(int keycode);
+	void keyUp(int keycode);
+
 	void OnKeyDown(wxKeyEvent& event);
 	void OnKeyUp(wxKeyEvent& event);
 	void SetSpeed(int speed);
@@ -41,8 +42,7 @@ protected:
 	DECLARE_EVENT_TABLE()
 private:
 	bool is_resizing;
-	//menu items
-    
+
 	void OnPauseEmulation(wxCommandEvent& event);
 	void OnTurnCalcOn(wxCommandEvent& event);
 	

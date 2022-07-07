@@ -3,7 +3,6 @@
 #include "calc.h"
 #include <wx/config.h>
 
-
 #define MAX_FILES 255
 typedef struct ParsedCmdArgs
 {
@@ -24,6 +23,7 @@ typedef struct ParsedCmdArgs
 class WabbitemuApp: public wxApp
 {
 private:
+   
 	virtual bool OnInit();
 	virtual int OnExit();
 	void OnTimer(wxTimerEvent& event);
@@ -37,6 +37,11 @@ private:
 	ParsedCmdArgs_t parsedArgs;
 	void ParseCommandLineArgs();
 	void LoadCommandlineFiles(INT_PTR,  void (*load_callback)(INT_PTR, LPTSTR, SEND_FLAG));
+
+    int height;     // Height of the window
+    int width;      // Width of the window
+    SDL_Renderer *renderer = NULL;      // Pointer for the renderer
+    SDL_Window *window = NULL;      // Pointer for the window
 };
 
 void LoadToLPCALC(INT_PTR lParam, LPTSTR filePath, SEND_FLAG sendLoc);
