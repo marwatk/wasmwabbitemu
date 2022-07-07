@@ -56,18 +56,6 @@ add_executable(wxWabbitemu
 	gui/gui.cpp #[[ This requires gui/gui.h ]]
 	gui/guiapp.cpp #[[ This requires gui/guiapp.h ]]
 	gui/guilcd.cpp #[[ This requires gui/guilcd.h ]]
-	gui/guivartree.cpp #[[ This requires gui/guivartree.h ]]
-	gui/wizard/wizardstart.cpp #[[ This requires gui/wizard/wizardstart.h ]]
-	gui/wizard/wizardcalctype.cpp #[[ This requires gui/wizard/wizardcalctype.h ]]
-	gui/wizard/wizardos.cpp #[[ This requires gui/wizard/wizardos.h ]]
-	gui/wizard/romwizard.cpp #[[ This requires gui/wizard/romwizard.h ]]
-	debugger/guidebug.cpp #[[ This requires debugger/guidebug.h ]]
-	#[[ Debugger and debugger GUI ]]
-	debugger/disassemblyview.cpp #[[ This requires debugger/disassemblyview.h ]]
-	debugger/disassemble.c
-	debugger/panes/regpane.cpp #[[ This requires debugger/panes/regpane.h ]]
-	debugger/panes/flagspane.cpp #[[ This requires debugger/panes/flagspane.h ]]
-	debugger/panes/cpupane.cpp #[[ This requires debugger/panes/cpupane.h ]]
 )
 
 target_include_directories(wxWabbitemu PUBLIC

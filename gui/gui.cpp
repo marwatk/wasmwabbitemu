@@ -149,36 +149,6 @@ WabbitemuFrame * gui_frame(LPCALC lpCalc) {
 void WabbitemuFrame::gui_frame_update() {
 	wxMenuBar *wxMenu = this->GetMenuBar();
 	switch(lpCalc->model) {
-		case TI_81:
-			lpCalc->calcSkin = wxGetBitmapFromMemory(TI_81_png, sizeof(TI_81_png)).ConvertToImage();
-			lpCalc->keymap = wxGetBitmapFromMemory(TI_81Keymap_png, sizeof(TI_81Keymap_png)).ConvertToImage();
-			break;
-		case TI_82:
-			lpCalc->calcSkin = wxGetBitmapFromMemory(TI_82_png, sizeof(TI_82_png)).ConvertToImage();
-			lpCalc->keymap = wxGetBitmapFromMemory(TI_82Keymap_png, sizeof(TI_82Keymap_png)).ConvertToImage();
-			break;
-		case TI_83:
-			lpCalc->calcSkin = wxGetBitmapFromMemory(TI_83_png, sizeof(TI_83_png)).ConvertToImage();
-			lpCalc->keymap = wxGetBitmapFromMemory(TI_83Keymap_png, sizeof(TI_83Keymap_png)).ConvertToImage();
-			break;
-		case TI_84P:
-			lpCalc->calcSkin = wxGetBitmapFromMemory(TI_84P_png, sizeof(TI_84P_png)).ConvertToImage();
-			lpCalc->keymap = wxGetBitmapFromMemory(TI_84PKeymap_png, sizeof(TI_84PKeymap_png)).ConvertToImage();
-			break;
-		case TI_84PSE:
-			lpCalc->calcSkin = wxGetBitmapFromMemory(TI_84PSE_png, sizeof(TI_84PSE_png)).ConvertToImage();
-			lpCalc->keymap = wxGetBitmapFromMemory(TI_84PKeymap_png, sizeof(TI_84PKeymap_png)).ConvertToImage();
-			break;
-		case TI_85:
-			lpCalc->calcSkin = wxGetBitmapFromMemory(TI_85_png, sizeof(TI_85_png)).ConvertToImage();
-			lpCalc->keymap = wxGetBitmapFromMemory(TI_85Keymap_png, sizeof(TI_85Keymap_png)).ConvertToImage();
-			break;
-		case TI_86:
-			lpCalc->calcSkin = wxGetBitmapFromMemory(TI_86_png, sizeof(TI_86_png)).ConvertToImage();
-			lpCalc->keymap = wxGetBitmapFromMemory(TI_86Keymap_png, sizeof(TI_86Keymap_png)).ConvertToImage();
-			break;
-		case TI_73:
-		case TI_83P:
 		default:
 			lpCalc->calcSkin = wxGetBitmapFromMemory(TI_83P_png, sizeof(TI_83P_png)).ConvertToImage();
 			lpCalc->keymap = wxGetBitmapFromMemory(TI_83PKeymap_png, sizeof(TI_83PKeymap_png)).ConvertToImage();

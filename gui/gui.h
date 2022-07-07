@@ -3,6 +3,8 @@
 #ifndef GUI_WX_H
 #define GUI_WX_H
 
+//#include <SDL.h>
+
 #include <wx/statusbr.h>
 #include <wx/frame.h>
 #include <wx/numdlg.h>
@@ -40,26 +42,14 @@ protected:
 private:
 	bool is_resizing;
 	//menu items
-	void OnFileQuit(wxCommandEvent& event);
-	void OnFileClose(wxCommandEvent& event);
-	void OnFileNew(wxCommandEvent& event);
-	void OnFileOpen(wxCommandEvent& event);
-	void OnFileGIF(wxCommandEvent& event);
     
-	void OnViewSkin(wxCommandEvent& event);
 	void OnPauseEmulation(wxCommandEvent& event);
 	void OnTurnCalcOn(wxCommandEvent& event);
 	
 	void OnSetSpeed(wxCommandEvent& event);
 	void OnSetSpeedCustom(wxCommandEvent& event);
 	void OnSetSize(wxCommandEvent& event);
-	
-	void OnDebugReset(wxCommandEvent& event);
-	void OnDebugOn(wxCommandEvent& event);
-	
-	void OnHelpWebsite(wxCommandEvent& event);
-	void OnHelpAbout(wxCommandEvent& event);
-	
+		
 	void OnPaint(wxPaintEvent& event);
 	// Resize
 	void OnResize(wxSizeEvent& event);

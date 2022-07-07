@@ -37,6 +37,8 @@ WORKDIR /opt/src
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential wx*
 
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libsdl2-dev
+
 COPY . /opt/src/
 RUN set -ex; \
     make -j4; \
