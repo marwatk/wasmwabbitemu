@@ -72,14 +72,6 @@ wxWabbitemu_exe = executable('wxWabbitemu',
 	'gui/gui.cpp',                   # This requires ../gui/gui.h
 	'gui/guiapp.cpp',                # This requires ../gui/guiapp.h
 	'gui/guilcd.cpp',                # This requires ../gui/guilcd.h
-	'debugger/guidebug.cpp',         # This requires ../debugger/guidebug.h
-	
-	# Debugger and debugger GUI
-	'debugger/disassemblyview.cpp',  # This requires ../debugger/disassemblyview.h
-	'debugger/disassemble.c',
-	'debugger/panes/regpane.cpp',    # This requires ../debugger/panes/regpane.h
-	'debugger/panes/flagspane.cpp',  # This requires ../debugger/panes/flagspane.h
-	'debugger/panes/cpupane.cpp',    # This requires ../debugger/panes/cpupane.h
 	
 	dependencies: wxWidgets_dep,
 	

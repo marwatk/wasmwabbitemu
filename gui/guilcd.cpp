@@ -157,20 +157,6 @@ void WabbitemuLCD::OnPaint(wxPaintEvent& event)
 	}
 	wxPaintDC dc(this);
 	PaintLCD(this, &dc);
-	LCD_t *lcd = lpCalc->cpu.pio.lcd;
-	wxStatusBar *wxStatus = mainFrame->GetStatusBar();
-	if (wxStatus) {
-		if (clock() > lpCalc->sb_refresh + CLOCKS_PER_SEC / 2) {
-			wxString sz_status;
-			if (lcd->active) {
-				sz_status.sprintf(wxT("FPS: %0.2lf"), lcd->ufps);
-			} else {
-				sz_status.sprintf(wxT("FPS: -"));
-			}
-			wxStatus->SetStatusText(sz_status, 0);
-			lpCalc->sb_refresh = clock();
-		}
-	}
 } 
 
 void WabbitemuLCD::PaintLCD(wxWindow *window, wxPaintDC *wxDCDest)
@@ -222,10 +208,23 @@ void WabbitemuLCD::PaintLCD(wxWindow *window, wxPaintDC *wxDCDest)
 		unsigned char rgb_data[128*64*3];
 		int i, j;
 		for (i = j = 0; i < 128*64; i++, j+=3) {
+			/*
+			if ( i % 128 == 0 ) {
+				std::cout << "\n";
+			}
+			if (screen[i] > 0) {
+				std::cout << "*";
+			}
+			else {
+				std::cout << " ";
+			}
+			*/
 			rgb_data[j] = redColors[screen[i]];
 			rgb_data[j+1] = greenColors[screen[i]];
 			rgb_data[j+2] = blueColors[screen[i]];
 		}
+		
+		// std::cout << "\n";
 
 		/*wxImageResizeQuality scalingMode = wxIMAGE_QUALITY_NORMAL;
 		//hiqh quality does bicubic sampling which looks terrible on our image
