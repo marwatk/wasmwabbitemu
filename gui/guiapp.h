@@ -30,6 +30,7 @@ private:
 	void getTimer(int slot);
 	void LoadSettings(LPCALC lpCalc);
 	void SaveSettings(LPCALC lpCalc);
+	void render();
 	wxConfigBase *settingsConfig;
 	wxTimer *timer;
 	unsigned GetTickCount();
@@ -38,10 +39,6 @@ private:
 	void ParseCommandLineArgs();
 	void LoadCommandlineFiles(INT_PTR,  void (*load_callback)(INT_PTR, LPTSTR, SEND_FLAG));
 
-    int height;     // Height of the window
-    int width;      // Width of the window
-    SDL_Renderer *renderer = NULL;      // Pointer for the renderer
-    SDL_Window *window = NULL;      // Pointer for the window
 };
 
 void LoadToLPCALC(INT_PTR lParam, LPTSTR filePath, SEND_FLAG sendLoc);

@@ -40,11 +40,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential wx*
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libsdl2-dev
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y x11-xserver-utils
 
-COPY . /opt/src/
-RUN set -ex; \
-    make -j4; \
-    : ;
-
 RUN apt-get install -y tightvncserver
 
 ENV USER=root
@@ -54,6 +49,12 @@ RUN set -ex; \
     echo -n password | vncpasswd -f > /root/.vnc/passwd; \
     chmod 600 /root/.vnc/passwd; \
     : ;
+
+COPY . /opt/src/
+RUN set -ex; \
+    make -j8; \
+    : ;
+
 
 ENV DISPLAY=:1
 ENV HOME=/root

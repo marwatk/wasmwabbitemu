@@ -4,6 +4,15 @@
 
 WabbitemuFrame *frames[MAX_CALCS];
 
+unsigned char redColors[MAX_SHADES+1];
+unsigned char greenColors[MAX_SHADES+1];
+unsigned char blueColors[MAX_SHADES+1];
+
+int frameNum = 0;
+LPCALC theCalc;
+SDL_Renderer *renderer = NULL;      // Pointer for the renderer
+SDL_Window *window = NULL;      // Pointer for the window
+
 void WabbitemuApp::LoadSettings(LPCALC lpCalc)
 {
 	settingsConfig = new wxConfig(wxT("Wabbitemu"));
@@ -48,12 +57,29 @@ bool WabbitemuApp::OnInit()
 	timer->Connect(wxEVT_TIMER, (wxObjectEventFunction) &WabbitemuApp::OnTimer);
 	timer->Start(TPF, false);
 
+#define LCD_HIGH	255
+	for (int i = 0; i <= MAX_SHADES; i++) {
+		redColors[i] = (0x9E*(256-(LCD_HIGH/MAX_SHADES)*i))/255;
+		greenColors[i] = (0xAB*(256-(LCD_HIGH/MAX_SHADES)*i))/255;
+		blueColors[i] = (0x88*(256-(LCD_HIGH/MAX_SHADES)*i))/255;
+	}
+
 	SDL_Init(SDL_INIT_VIDEO);       // Initializing SDL as Video
-	SDL_CreateWindowAndRenderer(400, 400, 0, &window, &renderer);
+	SDL_CreateWindowAndRenderer(128, 64, 0, &window, &renderer);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);      // setting draw color
 	SDL_RenderClear(renderer);      // Clear the newly created window
 	SDL_RenderPresent(renderer);    // Reflects the changes done in the
 
+	/*
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+	for( int x = 0; x < 128; x++ ) {
+		for ( int y = 0; y < 64; y++ ) {
+			SDL_RenderDrawPoint(renderer, x, y);
+		}
+	}
+	SDL_RenderPresent(renderer);
+	*/
+	theCalc = lpCalc;
 	return TRUE;
 }
 
@@ -117,6 +143,7 @@ void WabbitemuApp::OnTimer(wxTimerEvent& event) {
 		for (i = 0; i < MAX_CALCS; i++) {
 			if (calcs[i].active) {
 				frames[i]->gui_draw();
+				this->render();
 			}
 		}
 	// Frame skip if we're too far ahead.
@@ -161,6 +188,36 @@ void WabbitemuApp::OnTimer(wxTimerEvent& event) {
 			}
 		}
     }
+}
+
+void WabbitemuApp::render() {
+	//std::cout << "R Direct: " << static_cast<void*>(theCalc) << std::endl;
+	//std::cout << "Renderer: " << static_cast<void*>(renderer) << "\n";
+	if (theCalc == NULL) {
+		return;
+	}
+	LCD_t *lcd = theCalc->cpu.pio.lcd;
+	unsigned char *screen;
+	screen = LCD_image( lcd ) ;
+
+	unsigned char rgb_data[128*64*3];
+	int i, j;
+	int y = -1;
+	int x = 0;
+	for (i = j = 0; i < 128*64; i++, j+=3, x++) {
+		if ( i % 128 == 0 ) {
+			y++;
+			x = 0;
+		}
+		int r = redColors[screen[i]];
+		int g = greenColors[screen[i]];
+		int b = blueColors[screen[i]];
+
+		SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+		//std::cout << "(" << x << "," << y << ")[" << r << "," << g << "," << b << std::endl;
+		SDL_RenderDrawPoint(renderer, x, y);
+	}
+	SDL_RenderPresent(renderer);
 }
 
 void WabbitemuApp::ParseCommandLineArgs()

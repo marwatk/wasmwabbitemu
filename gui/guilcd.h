@@ -31,6 +31,10 @@ private:
 	void OnLeftButtonUp(wxMouseEvent& event);
 	void FinalizeButtons();
 
+	unsigned char redColors[MAX_SHADES+1];
+	unsigned char greenColors[MAX_SHADES+1];
+	unsigned char blueColors[MAX_SHADES+1];
+
 	bool hasDrawnLCD;
 	LPCALC lpCalc;
 	wxFrame *mainFrame;
