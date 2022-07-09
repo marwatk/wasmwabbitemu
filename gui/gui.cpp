@@ -48,7 +48,6 @@ WabbitemuFrame * gui_frame(LPCALC lpCalc) {
 	}
     
 	WabbitemuFrame *mainFrame = new WabbitemuFrame(lpCalc);
-	lpCalc->running = TRUE;
 	return mainFrame;
 }
 

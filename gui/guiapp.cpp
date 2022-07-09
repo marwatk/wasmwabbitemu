@@ -31,17 +31,14 @@ bool WabbitemuApp::OnInit()
 	LPCALC lpCalc = calc_slot_new();
 	LoadSettings(lpCalc);
 	
-	WabbitemuFrame *frame;
 	int result = rom_load(lpCalc, lpCalc->rom_path);
 	if (result == TRUE) {
-		frame = gui_frame(lpCalc);
 	} else {
 		calc_slot_free(lpCalc);
 		BOOL loadedRom = FALSE;
 		if (parsedArgs.num_rom_files > 0) {
 			for (int i = 0; i < parsedArgs.num_rom_files; i++) {
 				if (rom_load(lpCalc, parsedArgs.rom_files[i])) {
-					gui_frame(lpCalc);
 					loadedRom = TRUE;
 					break;
 				}
@@ -51,6 +48,7 @@ bool WabbitemuApp::OnInit()
 			return FALSE;
 		}
 	}
+	lpCalc->running = TRUE;
 	LoadCommandlineFiles((INT_PTR) lpCalc, LoadToLPCALC);
 	timer = new wxTimer();
 	timer->Connect(wxEVT_TIMER, (wxObjectEventFunction) &WabbitemuApp::OnTimer);
