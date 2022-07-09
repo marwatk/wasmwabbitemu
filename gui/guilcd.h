@@ -8,7 +8,7 @@
 #include <SDL.h>
 
 #define MAX_SHADES 255
-class WabbitemuLCD: public wxWindow
+class WabbitemuLCD
 {
 public:
 private:

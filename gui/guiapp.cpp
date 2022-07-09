@@ -32,9 +32,6 @@ bool WabbitemuApp::init() {
 		}
 	}
 	lpCalc->running = TRUE;
-	timer = new wxTimer();
-	timer->Connect(wxEVT_TIMER, (wxObjectEventFunction) &WabbitemuApp::OnTimer);
-	timer->Start(TPF, false);
 
 #define LCD_HIGH	255
 	for (int i = 0; i <= MAX_SHADES; i++) {
@@ -77,10 +74,6 @@ unsigned WabbitemuApp::GetTickCount()
 		return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 }
 
-void WabbitemuApp::OnTimer(wxTimerEvent& event) {
-	tick();
-}
-
 
 
 void WabbitemuApp::tick() {
@@ -118,16 +111,18 @@ void WabbitemuApp::tick() {
 	SDL_Event e;
     while (SDL_PollEvent(&e)) {  // poll until all events are handled!
         std::cout << "Got SDL event\n";
+		//std::cout << "WXK_UP: " << WXK_UP << "\n";
+		//std::cout << "WXK_DOWN: " << WXK_DOWN << "\n";
 		if( e.type == SDL_KEYDOWN ) {
 			switch( e.key.keysym.sym )
 			{
 				case SDLK_UP:
-				keyDown(WXK_UP);
+				keyDown(315); //WXK_UP);
 				printf( "UP!\n" );
 				break;
 
 				case SDLK_DOWN:
-				keyDown(WXK_DOWN);
+				keyDown(317); //WXK_DOWN);
 				printf( "DOWN!\n" );
 				break;
 
@@ -139,12 +134,11 @@ void WabbitemuApp::tick() {
 			switch( e.key.keysym.sym )
 			{
 				case SDLK_UP:
-				keyUp(WXK_UP);
+				keyUp(315); // WSK_UP;
 				break;
 
 				case SDLK_DOWN:
-				keyUp(WXK_DOWN);
-				printf( "DOWN!\n" );
+				keyUp(317); // WXK_DOWN);
 				break;
 
 				default:
@@ -203,12 +197,7 @@ void WabbitemuApp::keyDown(int keycode)
 
 void WabbitemuApp::keyUp(int key)
 {
-	if (key == WXK_SHIFT) {
-		keypad_key_release(&theCalc->cpu, WXK_LSHIFT);
-		keypad_key_release(&theCalc->cpu, WXK_RSHIFT);
-	} else {
-		keypad_key_release(&theCalc->cpu, key);
-	}
+	keypad_key_release(&theCalc->cpu, key);
 	FinalizeButtons();
 }
 

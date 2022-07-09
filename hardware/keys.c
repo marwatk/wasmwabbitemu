@@ -580,9 +580,9 @@ keyprog_t keygrps[256] = {
 	{ WXK_F4 , 6 , 1 },
 	{ WXK_F5 , 6 , 0 },
 	{ WXK_ESCAPE , 6 , 6 },
-	{ WXK_LSHIFT , 6 , 5 },			// l shift
+	{ 0 , 6 , 5 },			// l shift
 	{ WXK_CONTROL, 5 , 7 },			// l control
-	{ WXK_RSHIFT , 1 , 6 },
+	{ 0 , 1 , 6 },
 	{ '-', 2 , 0 },
 	{ WXK_NUMPAD_EQUAL , 4 , 7 },
 	//{ VK_PRIOR , 4 , 6 },

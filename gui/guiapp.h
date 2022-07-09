@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "gui.h"
 #include "calc.h"
-#include <wx/config.h>
 
 #include <SDL.h>
 
@@ -22,7 +21,7 @@ typedef struct ParsedCmdArgs
 } ParsedCmdArgs_t;
 
 
-class WabbitemuApp: public wxApp
+class WabbitemuApp
 {
 public:
  	void keyDown(int keycode);
@@ -35,11 +34,8 @@ public:
 
 	virtual bool OnInit();
 	virtual int OnExit();
-	void OnTimer(wxTimerEvent& event);
 	void getTimer(int slot);
 	void render();
-	wxConfigBase *settingsConfig;
-	wxTimer *timer;
 	unsigned GetTickCount();
 };
 
