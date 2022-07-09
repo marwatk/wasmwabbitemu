@@ -11,7 +11,7 @@ LPCALC theCalc;
 SDL_Renderer *renderer = NULL;      // Pointer for the renderer
 SDL_Window *window = NULL;      // Pointer for the window
 
-IMPLEMENT_APP(WabbitemuApp)
+//IMPLEMENT_APP(WabbitemuApp)
 
 #define ROM_FILE L"z.rom"
 
@@ -59,26 +59,7 @@ bool WabbitemuApp::OnInit()
 }
 
 int WabbitemuApp::exit() {
-	//load ROMs first
-	for (int i = 0; i < parsedArgs.num_rom_files; i++) {
-		free(parsedArgs.rom_files[i]);
-		parsedArgs.rom_files[i] = NULL;
-	}
-	//then archived files
-	for (int i = 0; i < parsedArgs.num_archive_files; i++) {
-		free(parsedArgs.archive_files[i]);
-		parsedArgs.archive_files[i] = NULL;
-	}
-	//then ram
-	for (int i = 0; i < parsedArgs.num_ram_files; i++) {
-		free(parsedArgs.ram_files[i]);
-		parsedArgs.ram_files[i] = NULL;
-	}
-	//finally utility files (label, break, etc)
-	for (int i = 0; i < parsedArgs.num_utility_files; i++) {
-		free(parsedArgs.utility_files[i]);
-		parsedArgs.utility_files[i] = NULL;
-	}
+
 	return 0;
 }
 
@@ -243,4 +224,13 @@ void WabbitemuApp::FinalizeButtons() {
 			}
 		}
 	}
+}
+
+int main(int argc, char * argv[]){
+	WabbitemuApp app;
+	app.init();
+	while(true){
+        SDL_Delay(10);  // setting some Delay
+		app.tick();
+    }
 }

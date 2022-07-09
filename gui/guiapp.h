@@ -24,7 +24,7 @@ typedef struct ParsedCmdArgs
 
 class WabbitemuApp: public wxApp
 {
-private:
+public:
  	void keyDown(int keycode);
 	void keyUp(int keycode);
 	void FinalizeButtons();
@@ -32,7 +32,7 @@ private:
 	bool init();
 	int exit();
 	void tick();
-	
+
 	virtual bool OnInit();
 	virtual int OnExit();
 	void OnTimer(wxTimerEvent& event);
@@ -41,11 +41,6 @@ private:
 	wxConfigBase *settingsConfig;
 	wxTimer *timer;
 	unsigned GetTickCount();
-	
-	ParsedCmdArgs_t parsedArgs;
-	void ParseCommandLineArgs();
-	void LoadCommandlineFiles(INT_PTR,  void (*load_callback)(INT_PTR, LPTSTR, SEND_FLAG));
-
 };
 
 void LoadToLPCALC(INT_PTR lParam, LPTSTR filePath, SEND_FLAG sendLoc);
