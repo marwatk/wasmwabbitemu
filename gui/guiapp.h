@@ -25,7 +25,10 @@ typedef struct ParsedCmdArgs
 class WabbitemuApp: public wxApp
 {
 private:
-   
+ 	void keyDown(int keycode);
+	void keyUp(int keycode);
+	void FinalizeButtons();
+	
 	virtual bool OnInit();
 	virtual int OnExit();
 	void OnTimer(wxTimerEvent& event);

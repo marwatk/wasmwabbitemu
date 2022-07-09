@@ -29,8 +29,6 @@ public:
     WabbitemuFrame(LPCALC);
    	wxWindow *wxLCD;
     
-	void keyDown(int keycode);
-	void keyUp(int keycode);
 
 	void OnKeyDown(wxKeyEvent& event);
 	void OnKeyUp(wxKeyEvent& event);
@@ -65,7 +63,6 @@ private:
 	void OnLeftButtonUp(wxMouseEvent& event);
 	void OnSize(wxSizeEvent& event);
 	void OnQuit(wxCloseEvent& event);
-	void FinalizeButtons();
 };
 int SetGIFName();
 WabbitemuFrame* gui_frame(LPCALC lpCalc);

@@ -160,12 +160,12 @@ void WabbitemuApp::OnTimer(wxTimerEvent& event) {
 			switch( e.key.keysym.sym )
 			{
 				case SDLK_UP:
-				frames[0]->keyDown(WXK_UP);
+				keyDown(WXK_UP);
 				printf( "UP!\n" );
 				break;
 
 				case SDLK_DOWN:
-				frames[0]->keyDown(WXK_DOWN);
+				keyDown(WXK_DOWN);
 				printf( "DOWN!\n" );
 				break;
 
@@ -177,11 +177,11 @@ void WabbitemuApp::OnTimer(wxTimerEvent& event) {
 			switch( e.key.keysym.sym )
 			{
 				case SDLK_UP:
-				frames[0]->keyUp(WXK_UP);
+				keyUp(WXK_UP);
 				break;
 
 				case SDLK_DOWN:
-				frames[0]->keyUp(WXK_DOWN);
+				keyUp(WXK_DOWN);
 				printf( "DOWN!\n" );
 				break;
 
@@ -293,5 +293,41 @@ void WabbitemuApp::LoadCommandlineFiles(INT_PTR lParam,  void (*load_callback)(I
 	//finally utility files (label, break, etc)
 	for (int i = 0; i < parsedArgs.num_utility_files; i++) {
 		load_callback(lParam, parsedArgs.utility_files[i], SEND_ARC);
+	}
+}
+
+void WabbitemuApp::keyDown(int keycode)
+{
+	keyprog_t *kp = keypad_key_press(&theCalc->cpu, keycode);
+	if (kp) {
+		if ((theCalc->cpu.pio.keypad->keys[kp->group][kp->bit] & KEY_STATEDOWN) == 0) {
+			theCalc->cpu.pio.keypad->keys[kp->group][kp->bit] |= KEY_STATEDOWN;
+			FinalizeButtons();
+		}
+	}
+}
+
+void WabbitemuApp::keyUp(int key)
+{
+	if (key == WXK_SHIFT) {
+		keypad_key_release(&theCalc->cpu, WXK_LSHIFT);
+		keypad_key_release(&theCalc->cpu, WXK_RSHIFT);
+	} else {
+		keypad_key_release(&theCalc->cpu, key);
+	}
+	FinalizeButtons();
+}
+
+void WabbitemuApp::FinalizeButtons() {
+	int group, bit;
+	keypad_t *kp = theCalc->cpu.pio.keypad;
+	for(group = 0; group < 7; group++) {
+		for(bit = 0; bit < 8; bit++) {
+			if ((kp->keys[group][bit] & KEY_STATEDOWN) &&
+				((kp->keys[group][bit] & KEY_MOUSEPRESS) == 0) &&
+				((kp->keys[group][bit] & KEY_KEYBOARDPRESS) == 0)) {
+					kp->keys[group][bit] &= (~KEY_STATEDOWN);
+			}
+		}
 	}
 }
