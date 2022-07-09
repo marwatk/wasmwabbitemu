@@ -93,7 +93,6 @@ OBJECTS := \
 	$(OBJDIR)/keys.o \
 	$(OBJDIR)/lcd.o \
 	$(OBJDIR)/link.o \
-	$(OBJDIR)/gui.o \
 	$(OBJDIR)/guiapp.o \
 
 RESOURCES := \
@@ -221,9 +220,6 @@ $(OBJDIR)/lcd.o: ../hardware/lcd.c
 $(OBJDIR)/link.o: ../hardware/link.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/gui.o: ../gui/gui.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/guiapp.o: ../gui/guiapp.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
