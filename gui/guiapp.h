@@ -34,8 +34,6 @@ private:
 	virtual int OnExit();
 	void OnTimer(wxTimerEvent& event);
 	void getTimer(int slot);
-	void LoadSettings(LPCALC lpCalc);
-	void SaveSettings(LPCALC lpCalc);
 	void render();
 	wxConfigBase *settingsConfig;
 	wxTimer *timer;

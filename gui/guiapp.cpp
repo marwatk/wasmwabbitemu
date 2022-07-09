@@ -13,20 +13,11 @@ SDL_Window *window = NULL;      // Pointer for the window
 
 IMPLEMENT_APP(WabbitemuApp)
 
-void WabbitemuApp::LoadSettings(LPCALC lpCalc)
-{
-	settingsConfig = new wxConfig(wxT("Wabbitemu"));
-	wxString tempString;
-	settingsConfig->Read(wxT("/rom_path"), &tempString, wxEmptyString);
-	_tcscpy(lpCalc->rom_path, tempString.c_str());
-	settingsConfig->Read(wxT("/SkinEnabled"), &lpCalc->SkinEnabled, FALSE);
-}
 
 bool WabbitemuApp::init() {
 	ParseCommandLineArgs();
 
 	LPCALC lpCalc = calc_slot_new();
-	LoadSettings(lpCalc);
 	
 	int result = rom_load(lpCalc, lpCalc->rom_path);
 	if (result == TRUE) {
