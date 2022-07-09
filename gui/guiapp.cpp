@@ -22,10 +22,7 @@ void WabbitemuApp::LoadSettings(LPCALC lpCalc)
 	settingsConfig->Read(wxT("/SkinEnabled"), &lpCalc->SkinEnabled, FALSE);
 }
 
-bool WabbitemuApp::OnInit()
-{
-	wxImage::AddHandler(new wxPNGHandler);
-	//stolen from the windows version
+bool WabbitemuApp::init() {
 	ParseCommandLineArgs();
 
 	LPCALC lpCalc = calc_slot_new();
@@ -67,17 +64,15 @@ bool WabbitemuApp::OnInit()
 	SDL_RenderClear(renderer);      // Clear the newly created window
 	SDL_RenderPresent(renderer);    // Reflects the changes done in the
 
-	/*
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	for( int x = 0; x < 128; x++ ) {
-		for ( int y = 0; y < 64; y++ ) {
-			SDL_RenderDrawPoint(renderer, x, y);
-		}
-	}
-	SDL_RenderPresent(renderer);
-	*/
 	theCalc = lpCalc;
 	return TRUE;
+}
+
+bool WabbitemuApp::OnInit()
+{
+	wxImage::AddHandler(new wxPNGHandler);
+	//stolen from the windows version
+	return init();
 }
 
 int WabbitemuApp::OnExit() {

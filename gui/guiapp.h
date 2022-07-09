@@ -29,6 +29,7 @@ private:
 	void keyUp(int keycode);
 	void FinalizeButtons();
 	
+	bool init();
 	virtual bool OnInit();
 	virtual int OnExit();
 	void OnTimer(wxTimerEvent& event);
