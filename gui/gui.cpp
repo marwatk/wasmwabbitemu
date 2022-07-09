@@ -74,27 +74,8 @@ enum
 BEGIN_EVENT_TABLE(WabbitemuFrame, wxFrame)
 	EVT_PAINT(WabbitemuFrame::OnPaint)
 	EVT_SIZE(WabbitemuFrame::OnResize)
-	
-	EVT_MENU(ID_Calc_Pause, WabbitemuFrame::OnPauseEmulation)
-	EVT_MENU(ID_Speed_Custom, WabbitemuFrame::OnSetSpeedCustom)
-	EVT_MENU(ID_Speed_500, WabbitemuFrame::OnSetSpeed)
-	EVT_MENU(ID_Speed_400, WabbitemuFrame::OnSetSpeed)
-	EVT_MENU(ID_Speed_200, WabbitemuFrame::OnSetSpeed)
-	EVT_MENU(ID_Speed_100, WabbitemuFrame::OnSetSpeed)
-	EVT_MENU(ID_Speed_50, WabbitemuFrame::OnSetSpeed)
-	EVT_MENU(ID_Speed_25, WabbitemuFrame::OnSetSpeed)
-	
-	EVT_MENU(ID_Size_100, WabbitemuFrame::OnSetSize)
-	EVT_MENU(ID_Size_200, WabbitemuFrame::OnSetSize)
-	EVT_MENU(ID_Size_300, WabbitemuFrame::OnSetSize)
-	EVT_MENU(ID_Size_400, WabbitemuFrame::OnSetSize)
-	
-	EVT_KEY_DOWN(WabbitemuFrame::OnKeyDown)
-	EVT_KEY_UP(WabbitemuFrame::OnKeyUp)
 	EVT_CLOSE(WabbitemuFrame::OnQuit)
 	
-	EVT_LEFT_DOWN(WabbitemuFrame::OnLeftButtonDown)
-	EVT_LEFT_UP(WabbitemuFrame::OnLeftButtonUp)
 END_EVENT_TABLE()
 
 IMPLEMENT_APP(WabbitemuApp)
@@ -254,7 +235,6 @@ WabbitemuFrame::WabbitemuFrame(LPCALC lpCalc) : wxFrame(NULL, wxID_ANY, wxT("Wab
 }
 
 void WabbitemuFrame::OnShow(wxShowEvent& event) {
-	this->isShownVar = 1;
 }
 
 void WabbitemuFrame::OnResize(wxSizeEvent& event) {
@@ -363,47 +343,12 @@ void WabbitemuFrame::OnSetSpeed(wxCommandEvent &event) {
 }
 
 void WabbitemuFrame::OnSetSpeedCustom(wxCommandEvent &event) {
-	wxMenuBar *wxMenu = this->GetMenuBar();
-	long resp;
-	resp = wxGetNumberFromUser(wxString(wxT("Enter the speed (in percentage) you wish to set:")), wxString(wxT("")), wxString(wxT("Wabbitemu - Custom Speed")), 100, 0, 10000);
-	if (resp != -1) {
-		wxMenu->SetLabel(ID_Speed_Custom, wxString::Format(wxT("%i%%"),resp));
-		wxMenu->Check(ID_Speed_500, false);
-		wxMenu->Check(ID_Speed_400, false);
-		wxMenu->Check(ID_Speed_200, false);
-		wxMenu->Check(ID_Speed_100, false);
-		wxMenu->Check(ID_Speed_50, false);
-		wxMenu->Check(ID_Speed_25, false);
-		wxMenu->Check(ID_Speed_Custom, true);
-		this->SetSpeed(resp);
-	} else {
-		// note to self: does the "entered something invalid" apply?? supposedly, OnSetSpeedCustom is checked...
-		/* Dirty, evil hack... but I'm too lazy to create another var to indicate
-		 * custom speed status, soo... :P */
-		if (wxMenu->GetLabel(ID_Speed_Custom) == wxString(wxT("Custom..."))) {
-			// Do nothing
-			wxMenu->Check(ID_Speed_Custom, false);
-		} else {
-			wxMenu->Check(ID_Speed_Custom, true);
-		}
-	}
 }
 
 void WabbitemuFrame::OnPauseEmulation(wxCommandEvent &event) {
-	wxMenuBar *wxMenu = this->GetMenuBar();
-	if (lpCalc->running) {
-		//Tick is checked and emulation stops
-		lpCalc->running = FALSE;
-		wxMenu->Check(ID_Calc_Pause, true);
-	} else {
-		//Tick is unchecked and emulation resumes
-		lpCalc->running = TRUE;
-		wxMenu->Check(ID_Calc_Pause, false);
-	}
 }
 
 void WabbitemuFrame::SetSpeed(int speed) {
-	lpCalc->speed = speed;
 }
 void WabbitemuFrame::keyDown(int keycode)
 {
@@ -426,13 +371,6 @@ void WabbitemuFrame::keyDown(int keycode)
 	}
 }
 
-void WabbitemuFrame::OnKeyDown(wxKeyEvent& event)
-{
-	std::cout << "gui KeyDown\n";
-	int keycode = event.GetKeyCode();
-	this->keyDown(keycode);
-}
-
 void WabbitemuFrame::keyUp(int key)
 {
 	if (key == WXK_SHIFT) {
@@ -443,94 +381,6 @@ void WabbitemuFrame::keyUp(int key)
 	}
 	FinalizeButtons();
 }
-
-void WabbitemuFrame::OnKeyUp(wxKeyEvent& event)
-{
-	int key = event.GetKeyCode();
-	this->keyUp(key);
-}
-
-void WabbitemuFrame::OnLeftButtonDown(wxMouseEvent& event)
-{
-	event.Skip(true);
-	static wxPoint pt;
-	keypad_t *kp = lpCalc->cpu.pio.keypad;
-
-	//CopySkinToButtons();
-	//CaptureMouse();
-	pt.x	= event.GetX();
-	pt.y	= event.GetY();
-	/*if (lpCalc->bCutout) {
-		pt.y += GetSystemMetrics(SM_CYCAPTION);
-		pt.x += GetSystemMetrics(SM_CXSIZEFRAME);
-	}*/
-	for(int group = 0; group < 7; group++) {
-		for(int bit = 0; bit < 8; bit++) {
-			kp->keys[group][bit] &= (~KEY_MOUSEPRESS);
-		}
-	}
-
-	lpCalc->cpu.pio.keypad->on_pressed &= ~KEY_MOUSEPRESS;
-
-	/*if (!event.LeftDown()) {
-		//FinalizeButtons(lpCalc);
-		return;
-	}*/
-
-	if (lpCalc->keymap.GetRed(pt.x, pt.y) == 0xFF) {
-		//FinalizeButtons(lpCalc);
-		return;
-	}
-
-	int green = lpCalc->keymap.GetGreen(pt.x, pt.y);
-	int blue = lpCalc->keymap.GetBlue(pt.x, pt.y);
-	if ((green >> 4) == 0x05 && (blue >> 4) == 0x00)
-	{
-		lpCalc->cpu.pio.keypad->on_pressed |= KEY_MOUSEPRESS;
-	} else {
-		kp->keys[green >> 4][blue >> 4] |= KEY_MOUSEPRESS;
-		if ((kp->keys[green >> 4][blue >> 4] & KEY_STATEDOWN) == 0) {
-			//DrawButtonState(lpCalc, lpCalc->hdcButtons, lpCalc->hdcKeymap, &pt, DBS_DOWN | DBS_PRESS);
-			kp->keys[green >> 4][blue >> 4] |= KEY_STATEDOWN;
-		}
-	}
-}
-
-void WabbitemuFrame::OnLeftButtonUp(wxMouseEvent& event)
-{
-	int group, bit;
-	event.Skip(true);
-	static wxPoint pt;
-	bool repostMessage = FALSE;
-	keypad_t *kp = lpCalc->cpu.pio.keypad;
-
-#define KEY_TIMER 1
-	//KillTimer(hwnd, KEY_TIMER);
-
-	for (group = 0; group < 7; group++) {
-		for (bit = 0; bit < 8; bit++) {
-#define MIN_KEY_DELAY 400
-			if (kp->last_pressed[group][bit] - lpCalc->cpu.timer_c->tstates >= MIN_KEY_DELAY || !lpCalc->running) {
-				kp->keys[group][bit] &= (~KEY_MOUSEPRESS);
-			} else {
-				repostMessage = TRUE;
-			}
-		}
-	}
-
-	if (kp->on_last_pressed - lpCalc->cpu.timer_c->tstates >= MIN_KEY_DELAY || !lpCalc->running) {
-		lpCalc->cpu.pio.keypad->on_pressed &= ~KEY_MOUSEPRESS;
-	} else {
-		repostMessage = TRUE;
-	}
-
-	if (repostMessage) {
-		//SetTimer(hwnd, KEY_TIMER, 50, NULL);
-	}
-
-	FinalizeButtons();
-}
-
 
 void WabbitemuFrame::OnQuit(wxCloseEvent& event)
 {
