@@ -61,12 +61,10 @@ bool WabbitemuApp::init() {
 
 bool WabbitemuApp::OnInit()
 {
-	wxImage::AddHandler(new wxPNGHandler);
-	//stolen from the windows version
 	return init();
 }
 
-int WabbitemuApp::OnExit() {
+int WabbitemuApp::exit() {
 	//load ROMs first
 	for (int i = 0; i < parsedArgs.num_rom_files; i++) {
 		free(parsedArgs.rom_files[i]);
@@ -90,6 +88,10 @@ int WabbitemuApp::OnExit() {
 	return 0;
 }
 
+int WabbitemuApp::OnExit() {
+	return exit();
+}
+
 
 unsigned WabbitemuApp::GetTickCount()
 {
@@ -99,9 +101,13 @@ unsigned WabbitemuApp::GetTickCount()
 
 		return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 }
-
-
 void WabbitemuApp::OnTimer(wxTimerEvent& event) {
+	tick();
+}
+
+
+
+void WabbitemuApp::tick() {
 	static int difference;
 	static unsigned prevTimer;
 	unsigned dwTimer = GetTickCount();

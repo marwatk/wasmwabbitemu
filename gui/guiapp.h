@@ -30,6 +30,9 @@ private:
 	void FinalizeButtons();
 	
 	bool init();
+	int exit();
+	void tick();
+	
 	virtual bool OnInit();
 	virtual int OnExit();
 	void OnTimer(wxTimerEvent& event);
