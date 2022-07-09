@@ -13,6 +13,8 @@ LPCALC theCalc;
 SDL_Renderer *renderer = NULL;      // Pointer for the renderer
 SDL_Window *window = NULL;      // Pointer for the window
 
+IMPLEMENT_APP(WabbitemuApp)
+
 void WabbitemuApp::LoadSettings(LPCALC lpCalc)
 {
 	settingsConfig = new wxConfig(wxT("Wabbitemu"));

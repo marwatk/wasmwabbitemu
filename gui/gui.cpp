@@ -33,8 +33,6 @@ BEGIN_EVENT_TABLE(WabbitemuFrame, wxFrame)
 	
 END_EVENT_TABLE()
 
-IMPLEMENT_APP(WabbitemuApp)
-
 inline wxBitmap wxGetBitmapFromMemory(const unsigned char *data, int length) {
    wxMemoryInputStream is(data, length);
    return wxBitmap(wxImage(is, wxBITMAP_TYPE_PNG, -1), -1);
