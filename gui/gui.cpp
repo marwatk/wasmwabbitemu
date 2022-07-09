@@ -1,7 +1,6 @@
 #include "gui.h"
 #include "guiapp.h"
 #include "calc.h"
-#include "guiopenfile.h"
 #include "keys.h"
 #include "sendfile.h"
 #include "wabbiticon.xpm"
@@ -58,58 +57,12 @@ WabbitemuFrame * gui_frame(LPCALC lpCalc) {
 	}
     
 	WabbitemuFrame *mainFrame = new WabbitemuFrame(lpCalc);
-	mainFrame->Show(true);
 	frames[lpCalc->slot] = mainFrame;
-
-
 	lpCalc->running = TRUE;
 	return mainFrame;
 }
 
 void WabbitemuFrame::gui_frame_update() {
-	wxMenuBar *wxMenu = this->GetMenuBar();
-	switch(lpCalc->model) {
-		default:
-			lpCalc->calcSkin = wxGetBitmapFromMemory(TI_83P_png, sizeof(TI_83P_png)).ConvertToImage();
-			lpCalc->keymap = wxGetBitmapFromMemory(TI_83PKeymap_png, sizeof(TI_83PKeymap_png)).ConvertToImage();
-			break;
-	}
-	int skinWidth, skinHeight, keymapWidth, keymapHeight;
-	
-	if (lpCalc->calcSkin.IsOk()) {
-		skinWidth = 350;//lpCalc->calcSkin.GetWidth();
-		skinHeight = 725;//lpCalc->calcSkin.GetHeight();
-	}
-	if (lpCalc->keymap.IsOk()) {
-		keymapWidth = 350;//lpCalc->keymap.GetWidth();
-		keymapHeight = 725;//lpCalc->keymap.GetHeight();
-	}
-	int foundX = 0, foundY = 0;
-	bool foundScreen = false;
-	if (((skinWidth != keymapWidth) || (skinHeight != keymapHeight)) && skinHeight > 0 && skinWidth > 0) {
-		lpCalc->SkinEnabled = false;
-		wxMessageBox(wxT("Skin and Keymap are not the same size"), wxT("Error"),  wxOK, NULL);
-	}
-
-	if (!lpCalc->SkinEnabled) {
-		// Create status bar
-		wxStatusBar *wxStatus = this->GetStatusBar();
-		if (wxStatus == NULL) {
-			wxStatus = this->CreateStatusBar(2, wxST_SIZEGRIP, wxID_ANY );
-		}
-		const int iStatusWidths[] = {100, -1};
-		wxStatus->SetFieldsCount(2, iStatusWidths);
-		wxStatus->SetStatusText(wxEmptyString);
-		wxStatus->SetStatusText(CalcModelTxt[lpCalc->model], 1);
-		
-		wxSize skinSize(128*lpCalc->scale, 64*lpCalc->scale);
-		this->SetClientSize(skinSize);
-	} else {
-		wxStatusBar *wxStatus = this->GetStatusBar();
-		wxSize skinSize(350, 725);
-		this->SetClientSize(skinSize);
-	}
-	this->SendSizeEvent();
 }
 
 WabbitemuFrame::WabbitemuFrame(LPCALC lpCalc) : wxFrame(NULL, wxID_ANY, wxT("Wabbitemu"))
