@@ -60,15 +60,6 @@ void WabbitemuFrame::gui_frame_update() {
 WabbitemuFrame::WabbitemuFrame(LPCALC lpCalc) : wxFrame(NULL, wxID_ANY, wxT("Wabbitemu"))
 {
 	this->lpCalc = lpCalc;
-	
-	wxSize skinSize(350, 725);
-	lpCalc->SkinSize = skinSize;
-	LCD_t *lcd = lpCalc->cpu.pio.lcd;
-	int scale = lpCalc->scale;
-	int draw_width = lcd->width * scale;
-	int draw_height = 64 * scale;
-	wxRect lcdRect((128 * scale - draw_width) / 2, 0, draw_width, draw_height);
-	lpCalc->LCDRect = lcdRect;
 }
 
 void WabbitemuFrame::keyDown(int keycode)
