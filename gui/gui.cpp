@@ -42,14 +42,12 @@ int WabbitemuFrame::gui_draw() {
 	return 0;
 }
 
-extern WabbitemuFrame *frames[MAX_CALCS];
 WabbitemuFrame * gui_frame(LPCALC lpCalc) {
 	if (!lpCalc->scale) {
     	lpCalc->scale = 2; //Set original scale
 	}
     
 	WabbitemuFrame *mainFrame = new WabbitemuFrame(lpCalc);
-	frames[lpCalc->slot] = mainFrame;
 	lpCalc->running = TRUE;
 	return mainFrame;
 }

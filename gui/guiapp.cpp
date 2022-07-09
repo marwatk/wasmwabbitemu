@@ -2,8 +2,6 @@
 #include "gui.h"
 #include "sendfile.h"
 
-WabbitemuFrame *frames[MAX_CALCS];
-
 unsigned char redColors[MAX_SHADES+1];
 unsigned char greenColors[MAX_SHADES+1];
 unsigned char blueColors[MAX_SHADES+1];
@@ -30,7 +28,6 @@ bool WabbitemuApp::OnInit()
 	//stolen from the windows version
 	ParseCommandLineArgs();
 
-	memset(frames, 0, sizeof(frames));
 	LPCALC lpCalc = calc_slot_new();
 	LoadSettings(lpCalc);
 	
@@ -144,7 +141,6 @@ void WabbitemuApp::OnTimer(wxTimerEvent& event) {
 		int i;
 		for (i = 0; i < MAX_CALCS; i++) {
 			if (calcs[i].active) {
-				frames[i]->gui_draw();
 				this->render();
 			}
 		}
