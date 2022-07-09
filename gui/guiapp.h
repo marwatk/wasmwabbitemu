@@ -3,6 +3,8 @@
 #include "calc.h"
 #include <wx/config.h>
 
+#include <SDL.h>
+
 #define MAX_FILES 255
 typedef struct ParsedCmdArgs
 {

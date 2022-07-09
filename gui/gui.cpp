@@ -105,8 +105,6 @@ inline wxBitmap wxGetBitmapFromMemory(const unsigned char *data, int length) {
 }
 
 int WabbitemuFrame::gui_draw() {
-	wxLCD->Refresh();
-	wxLCD->Update();
 
 	if (lpCalc->gif_disp_state != GDS_IDLE) {
 		static int skip = 0;
@@ -129,14 +127,7 @@ WabbitemuFrame * gui_frame(LPCALC lpCalc) {
 	mainFrame->Show(true);
 	frames[lpCalc->slot] = mainFrame;
 
-	mainFrame->wxLCD = new WabbitemuLCD(mainFrame, lpCalc);
-	mainFrame->wxLCD->Show(true);
-	if (lpCalc->SkinEnabled) {
-		mainFrame->wxLCD->Move((mainFrame->GetClientSize().GetWidth() - lpCalc->cpu.pio.lcd->width * lpCalc->scale) / 2, 0);
-	} else {
-		mainFrame->wxLCD->Move(lpCalc->LCDRect.GetX(), lpCalc->LCDRect.GetY());
-	}
-	
+
 	lpCalc->running = TRUE;
 	mainFrame->SetSpeed(100);
 	
@@ -231,8 +222,6 @@ void WabbitemuFrame::gui_frame_update() {
 		wxSize skinSize(350, 725);
 		this->SetClientSize(skinSize);
 	}
-	wxLCD->SetClientSize(lpCalc->LCDRect.GetSize());
-	wxLCD->Raise();
 	this->SendSizeEvent();
 }
 
@@ -271,9 +260,6 @@ void WabbitemuFrame::OnShow(wxShowEvent& event) {
 void WabbitemuFrame::OnResize(wxSizeEvent& event) {
 	event.Skip(true);
 	if (lpCalc->SkinEnabled ) {
-		if (wxLCD) {
-			wxLCD->Move(lpCalc->LCDRect.GetX(), lpCalc->LCDRect.GetY());
-		}
 		return;
 	}
 	if (is_resizing) {
@@ -290,26 +276,10 @@ void WabbitemuFrame::OnResize(wxSizeEvent& event) {
 	this->SetClientSize(size);
 	this->Move(scale * (128 - lpCalc->cpu.pio.lcd->width), 0);
 	is_resizing = false;
-	if (!lpCalc->SkinEnabled && wxLCD) {
-		if (this->isShownVar == 1) {
-			if (wxLCD->IsShown()) {
-				wxLCD->Move((GetClientSize().GetWidth() - lpCalc->cpu.pio.lcd->width * scale) / 2, 0);
-			} else {
-				printf("WARNING: wxLCD->IsShown() returned false - NOT moving.\n");
-			}
-		} else {
-			printf("WARNING: this->isShownVar == 1 returned false - NOT moving.\n");
-		}
-	}
 }
 
 void WabbitemuFrame::OnPaint(wxPaintEvent& event)
 {
-	wxPaintDC dc(this);
-	if (lpCalc->SkinEnabled) {
-		this->wxLCD->Update();
-		dc.DrawBitmap(lpCalc->calcSkin, 0, 0, true);
-	}
 }
 
 void WabbitemuFrame::OnSetSize(wxCommandEvent &event) {

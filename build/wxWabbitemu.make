@@ -33,7 +33,7 @@ ifeq ($(config),debug)
   DEFINES   += -DDEBUG -D_UNICODE -DWXUSINGDLL -DHIGH_SHADE_GIF -DVERBOSE -D_LINUX -DWXVER
   INCLUDES  += -I.. -I../core -I../debugger -I../gui -I../hardware -I../interface -I../utilities
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -Wall -x c++ $(WX_CFLAGS) $(SDL_CFLAGS)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -w -x c++ $(WX_CFLAGS) $(SDL_CFLAGS)
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += $(WX_LDFLAGS) $(SDL_LDFLAGS)
   LIBS      += 
@@ -95,7 +95,6 @@ OBJECTS := \
 	$(OBJDIR)/link.o \
 	$(OBJDIR)/gui.o \
 	$(OBJDIR)/guiapp.o \
-	$(OBJDIR)/guilcd.o \
 
 RESOURCES := \
 
@@ -226,9 +225,6 @@ $(OBJDIR)/gui.o: ../gui/gui.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/guiapp.o: ../gui/guiapp.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/guilcd.o: ../gui/guilcd.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
