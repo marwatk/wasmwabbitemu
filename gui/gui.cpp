@@ -31,45 +31,7 @@
 bool gif_anim_advance;
 bool silent_mode = false;
 int prevCalcScale;
-enum
-{
-	ID_File_New,
-	ID_File_Open,
-	ID_File_Save,
-	ID_File_Gif,
-	ID_File_Close,
-	ID_File_Quit,
 
-	ID_View_Skin,
-	ID_View_Vars,
-
-	ID_Calc_Copy,
-	ID_Calc_Sound,
-	ID_Calc_Pause,
-	ID_Calc_Connect,
-	ID_Calc_Options,
-	
-	ID_Speed_400,
-	ID_Speed_500,
-	ID_Speed_200,
-	ID_Speed_100,
-	ID_Speed_50,
-	ID_Speed_25,
-	ID_Speed_Custom,
-	
-	ID_Size_100,
-	ID_Size_200,
-	ID_Size_300,
-	ID_Size_400,
-	
-	ID_Debug_Reset,
-	ID_Debug_Open,
-	ID_Debug_On,
-	
-	ID_Help_Setup,
-	ID_Help_About,
-	ID_Help_Website
-};
 
 BEGIN_EVENT_TABLE(WabbitemuFrame, wxFrame)
 	EVT_PAINT(WabbitemuFrame::OnPaint)
@@ -130,9 +92,6 @@ void WabbitemuFrame::gui_frame_update() {
 	}
 
 	if (!lpCalc->SkinEnabled) {
-		if (wxMenu != NULL) {
-			wxMenu->Check(ID_View_Skin, false);
-		}
 		// Create status bar
 		wxStatusBar *wxStatus = this->GetStatusBar();
 		if (wxStatus == NULL) {
@@ -146,13 +105,7 @@ void WabbitemuFrame::gui_frame_update() {
 		wxSize skinSize(128*lpCalc->scale, 64*lpCalc->scale);
 		this->SetClientSize(skinSize);
 	} else {
-		if (wxMenu != NULL) {
-			wxMenu->Check(ID_View_Skin, true);
-		}
 		wxStatusBar *wxStatus = this->GetStatusBar();
-		if (wxStatus != NULL) {
-			wxStatus->Destroy();
-		}
 		wxSize skinSize(350, 725);
 		this->SetClientSize(skinSize);
 	}
