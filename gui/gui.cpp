@@ -27,14 +27,8 @@
 #define min(a, b)  (((a) < (b)) ? (a) : (b))
 #endif
 
-bool gif_anim_advance;
-bool silent_mode = false;
-int prevCalcScale;
-
 
 BEGIN_EVENT_TABLE(WabbitemuFrame, wxFrame)
-	EVT_PAINT(WabbitemuFrame::OnPaint)
-	EVT_SIZE(WabbitemuFrame::OnResize)
 	EVT_CLOSE(WabbitemuFrame::OnQuit)
 	
 END_EVENT_TABLE()
@@ -79,30 +73,6 @@ WabbitemuFrame::WabbitemuFrame(LPCALC lpCalc) : wxFrame(NULL, wxID_ANY, wxT("Wab
 	lpCalc->LCDRect = lcdRect;
 }
 
-void WabbitemuFrame::OnShow(wxShowEvent& event) {
-}
-
-void WabbitemuFrame::OnResize(wxSizeEvent& event) {
-}
-
-void WabbitemuFrame::OnPaint(wxPaintEvent& event)
-{
-}
-
-void WabbitemuFrame::OnSetSize(wxCommandEvent &event) {
-}
-
-void WabbitemuFrame::OnSetSpeed(wxCommandEvent &event) {
-}
-
-void WabbitemuFrame::OnSetSpeedCustom(wxCommandEvent &event) {
-}
-
-void WabbitemuFrame::OnPauseEmulation(wxCommandEvent &event) {
-}
-
-void WabbitemuFrame::SetSpeed(int speed) {
-}
 void WabbitemuFrame::keyDown(int keycode)
 {
 	keyprog_t *kp = keypad_key_press(&lpCalc->cpu, keycode);
