@@ -86,15 +86,6 @@ inline wxBitmap wxGetBitmapFromMemory(const unsigned char *data, int length) {
 }
 
 int WabbitemuFrame::gui_draw() {
-
-	if (lpCalc->gif_disp_state != GDS_IDLE) {
-		static int skip = 0;
-		if (skip == 0) {
-			gif_anim_advance = true;
-			this->Update();
-		}
-		skip = (skip + 1) % 4;
-	}
 	return 0;
 }
 
@@ -110,11 +101,6 @@ WabbitemuFrame * gui_frame(LPCALC lpCalc) {
 
 
 	lpCalc->running = TRUE;
-	mainFrame->SetSpeed(100);
-	
-	mainFrame->Center();   //Centres the frame
-	
-	mainFrame->gui_frame_update();
 	return mainFrame;
 }
 
@@ -141,39 +127,6 @@ void WabbitemuFrame::gui_frame_update() {
 	if (((skinWidth != keymapWidth) || (skinHeight != keymapHeight)) && skinHeight > 0 && skinWidth > 0) {
 		lpCalc->SkinEnabled = false;
 		wxMessageBox(wxT("Skin and Keymap are not the same size"), wxT("Error"),  wxOK, NULL);
-	} else {
-		lpCalc->SkinSize.SetWidth(skinWidth);
-		lpCalc->SkinSize.SetHeight(skinHeight);		//find the screen size
-		for(int y = 0; y < skinHeight && foundScreen == false; y++) {
-			for (int x = 0; x < skinWidth && foundScreen == false; x++) {
-				if (lpCalc->keymap.GetBlue(x, y) == 0 &&
-						lpCalc->keymap.GetRed(x, y) == 255 &&
-						lpCalc->keymap.GetGreen(x, y) == 0) {
-					//81 92
-					foundX = x;
-					foundY = y;
-					foundScreen = true;
-				}
-			}
-		}
-		lpCalc->LCDRect.SetLeft(foundX);
-		lpCalc->LCDRect.SetTop(foundY);
-		do {
-			foundX++;
-		} while (lpCalc->keymap.GetBlue(foundX, foundY) == 0 &&
-				lpCalc->keymap.GetRed(foundX, foundY) == 255 &&
-				lpCalc->keymap.GetGreen(foundX, foundY) == 0);
-		lpCalc->LCDRect.SetRight(--foundX);
-		do {
-			foundY++;
-		}while (lpCalc->keymap.GetBlue(foundX, foundY) == 0 &&
-				lpCalc->keymap.GetRed(foundX, foundY) == 255 &&
-				lpCalc->keymap.GetGreen(foundX, foundY) == 0);
-		lpCalc->LCDRect.SetBottom(--foundY);
-	}
-	if (!foundScreen) {
-		wxMessageBox(wxT("Unable to find the screen box"), wxT("Error"), wxOK, NULL);
-		lpCalc->SkinEnabled = false;
 	}
 
 	if (!lpCalc->SkinEnabled) {
@@ -210,7 +163,6 @@ WabbitemuFrame::WabbitemuFrame(LPCALC lpCalc) : wxFrame(NULL, wxID_ANY, wxT("Wab
 {
 	this->lpCalc = lpCalc;
 	
-	this->SetWindowStyleFlag(wxBORDER_RAISED);
 	wxSize skinSize(350, 725);
 	lpCalc->SkinSize = skinSize;
 	LCD_t *lcd = lpCalc->cpu.pio.lcd;
@@ -219,43 +171,12 @@ WabbitemuFrame::WabbitemuFrame(LPCALC lpCalc) : wxFrame(NULL, wxID_ANY, wxT("Wab
 	int draw_height = 64 * scale;
 	wxRect lcdRect((128 * scale - draw_width) / 2, 0, draw_width, draw_height);
 	lpCalc->LCDRect = lcdRect;
-
-	wxSize windowSize;
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-
-	wxMenuBar *m_menubar = new wxMenuBar( 0 );
-		
-	windowSize.Set(128 * scale, 64 * scale);
-	
-	this->Connect(wxEVT_SHOW, (wxObjectEventFunction) &WabbitemuFrame::OnShow);
-	
-	this->SetSize(windowSize);
-
-
 }
 
 void WabbitemuFrame::OnShow(wxShowEvent& event) {
 }
 
 void WabbitemuFrame::OnResize(wxSizeEvent& event) {
-	event.Skip(true);
-	if (lpCalc->SkinEnabled ) {
-		return;
-	}
-	if (is_resizing) {
-		return;
-	}
-	
-	int width_scale = GetClientSize().GetWidth() / 128;
-	int height_scale = GetClientSize().GetHeight() / 64;
-	int scale = max(2, max(width_scale, height_scale));
-
-	lpCalc->scale = min(2, scale);
-	wxSize size(scale * 128, scale * 64);
-	is_resizing = true;
-	this->SetClientSize(size);
-	this->Move(scale * (128 - lpCalc->cpu.pio.lcd->width), 0);
-	is_resizing = false;
 }
 
 void WabbitemuFrame::OnPaint(wxPaintEvent& event)
@@ -263,83 +184,9 @@ void WabbitemuFrame::OnPaint(wxPaintEvent& event)
 }
 
 void WabbitemuFrame::OnSetSize(wxCommandEvent &event) {
-	/* This function is called when user changes size of LCD in menu */
-    wxMenuBar *wxMenu = this->GetMenuBar();
-    if (lpCalc->SkinEnabled) {
-		return;
-	}
-	int eventID;
-	wxMenu->Check(ID_Size_100,false);
-	wxMenu->Check(ID_Size_200,false);
-	wxMenu->Check(ID_Size_300,false);
-	wxMenu->Check(ID_Size_400,false);
-	
-	eventID = event.GetId();
-	
-	switch (eventID) {
-		case ID_Size_100:
-			lpCalc->scale = 1;  //This is half of the Wabbit default, but equals real LCD
-			wxMenu->Check(ID_Size_100, true);
-			break;
-		case ID_Size_200:
-			lpCalc->scale = 2; //Wabbit default, twice the LCD
-			wxMenu->Check(ID_Size_200, true);
-			break;
-		case ID_Size_300:
-			lpCalc->scale = 3;
-			wxMenu->Check(ID_Size_300, true);
-			break;
-		case ID_Size_400:
-			lpCalc->scale = 4;
-			wxMenu->Check(ID_Size_400, true);
-			break;
-	}
-	if (!lpCalc->SkinEnabled) {
-		/* Update size of frame to match the new LCD Size */
-		this->SetSize(128 * lpCalc->scale, 64 * lpCalc->scale);
-	}
 }
 
 void WabbitemuFrame::OnSetSpeed(wxCommandEvent &event) {
-	wxMenuBar *wxMenu = this->GetMenuBar();
-	int eventID;
-	wxMenu->Check(ID_Speed_500, false);
-	wxMenu->Check(ID_Speed_400, false);
-	wxMenu->Check(ID_Speed_200, false);
-	wxMenu->Check(ID_Speed_100, false);
-	wxMenu->Check(ID_Speed_50, false);
-	wxMenu->Check(ID_Speed_25, false);
-	wxMenu->Check(ID_Speed_Custom, false);
-	wxMenu->SetLabel(ID_Speed_Custom, wxString(wxT("Custom...")));
-	wxMenu->Check(ID_Speed_Custom, false);
-	
-	eventID = event.GetId();
-	switch (eventID) {
-		case ID_Speed_25:
-			this->SetSpeed(25);
-			wxMenu->Check(ID_Speed_25, true);
-			break;
-		case ID_Speed_50:
-			this->SetSpeed(50);
-			wxMenu->Check(ID_Speed_50, true);
-			break;
-		case ID_Speed_100:
-			this->SetSpeed(100);
-			wxMenu->Check(ID_Speed_100, true);
-			break;
-		case ID_Speed_200:
-			this->SetSpeed(200);
-			wxMenu->Check(ID_Speed_200, true);
-			break;
-		case ID_Speed_400:
-			this->SetSpeed(400);
-			wxMenu->Check(ID_Speed_400, true);
-			break;
-		case ID_Speed_500:
-			this->SetSpeed(500);
-			wxMenu->Check(ID_Speed_500, true);
-			break;
-	}
 }
 
 void WabbitemuFrame::OnSetSpeedCustom(wxCommandEvent &event) {
@@ -352,14 +199,6 @@ void WabbitemuFrame::SetSpeed(int speed) {
 }
 void WabbitemuFrame::keyDown(int keycode)
 {
-	if (keycode == WXK_F8) {
-		if (lpCalc->speed == 100) {
-			SetSpeed(400);
-		} else {
-			SetSpeed(100);
-		}
-	}
-
 	keyprog_t *kp = keypad_key_press(&lpCalc->cpu, keycode);
 	if (kp) {
 		if ((lpCalc->cpu.pio.keypad->keys[kp->group][kp->bit] & KEY_STATEDOWN) == 0) {
@@ -384,9 +223,6 @@ void WabbitemuFrame::keyUp(int key)
 
 void WabbitemuFrame::OnQuit(wxCloseEvent& event)
 {
-
-	lpCalc->active = FALSE;
-	event.Skip();
 }
 
 void WabbitemuFrame::FinalizeButtons() {
