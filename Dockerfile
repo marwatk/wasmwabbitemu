@@ -22,8 +22,6 @@ RUN set -ex; \
     ./emsdk activate latest; \
     : ;
 
-
-
 ENV PATH="/opt/emsdk:/opt/emsdk/node/14.18.2_64bit/bin:/opt/emsdk/upstream/emscripten:$PATH"
 ENV EMSDK=/opt/emsdk
 ENV EM_CONFIG=/opt/emsdk/.emscripten
@@ -39,6 +37,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libsdl2-dev
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y x11-xserver-utils
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y busybox
 
 RUN apt-get install -y tightvncserver
 
@@ -52,12 +51,13 @@ RUN set -ex; \
 
 COPY . /opt/src/
 RUN set -ex; \
-    make -j8; \
+    env; \
+    emmake make -j8; \
     : ;
 
 
 ENV DISPLAY=:1
 ENV HOME=/root
 
-
-CMD ["bash", "-c", "tightvncserver; DISPLAY=:1 bin/wxWabbitemu z.rom"]
+CMD ["bash", "-c", "busybox httpd -p 8080 -h /opt/src/bin -f"]
+#CMD ["bash", "-c", "tightvncserver; DISPLAY=:1 bin/wxWabbitemu z.rom"]

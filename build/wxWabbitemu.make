@@ -15,11 +15,11 @@ ifndef verbose
 endif
 
 ifndef CC
-  CC = gcc
+  CC = emcc
 endif
 
 ifndef CXX
-  CXX = g++
+  CXX = emcc
 endif
 
 ifndef AR
@@ -29,7 +29,7 @@ endif
 ifeq ($(config),debug)
   OBJDIR     = obj/Debug
   TARGETDIR  = ../bin
-  TARGET     = $(TARGETDIR)/wxWabbitemu
+  TARGET     = $(TARGETDIR)/wxWabbitemu.html
   DEFINES   += -DDEBUG -DSDL -DWXUSINGDLL -DHIGH_SHADE_GIF -DVERBOSE -D_LINUX
   INCLUDES  += -I.. -I../core -I../debugger -I../gui -I../hardware -I../interface -I../utilities
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
@@ -55,9 +55,9 @@ ifeq ($(config),release)
   DEFINES   += -DWXUSINGDLL -DHIGH_SHADE_GIF -DVERBOSE -D_LINUX -DSDL
   INCLUDES  += -I.. -I../core -I../debugger -I../gui -I../hardware -I../interface -I../utilities
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 -x c++ $(SDL_CFLAGS)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 -x c++ -sUSE_SDL=2
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -s $(SDL_LDFLAGS)
+  LDFLAGS   += -sUSE_SDL=2
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
