@@ -30,12 +30,12 @@ ifeq ($(config),debug)
   OBJDIR     = obj/Debug
   TARGETDIR  = ../bin
   TARGET     = $(TARGETDIR)/wxWabbitemu
-  DEFINES   += -DDEBUG -D_UNICODE -DWXUSINGDLL -DHIGH_SHADE_GIF -DVERBOSE -D_LINUX -DWXVER
+  DEFINES   += -DDEBUG -DSDL -DWXUSINGDLL -DHIGH_SHADE_GIF -DVERBOSE -D_LINUX
   INCLUDES  += -I.. -I../core -I../debugger -I../gui -I../hardware -I../interface -I../utilities
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -w -x c++ $(WX_CFLAGS) $(SDL_CFLAGS)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -g -w -x c++ $(SDL_CFLAGS)
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += $(WX_LDFLAGS) $(SDL_LDFLAGS)
+  LDFLAGS   += $(SDL_LDFLAGS)
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
@@ -52,12 +52,12 @@ ifeq ($(config),release)
   OBJDIR     = obj/Release
   TARGETDIR  = ../bin
   TARGET     = $(TARGETDIR)/wxWabbitemu
-  DEFINES   += -D_UNICODE -DWXUSINGDLL -DHIGH_SHADE_GIF -DVERBOSE -D_LINUX -DWXVER
+  DEFINES   += -DWXUSINGDLL -DHIGH_SHADE_GIF -DVERBOSE -D_LINUX -DSDL
   INCLUDES  += -I.. -I../core -I../debugger -I../gui -I../hardware -I../interface -I../utilities
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
-  CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 -x c++ $(WX_CFLAGS) $(SDL_CFLAGS)
+  CFLAGS    += $(CPPFLAGS) $(ARCH) -O2 -x c++ $(SDL_CFLAGS)
   CXXFLAGS  += $(CFLAGS) 
-  LDFLAGS   += -s $(WX_LDFLAGS) $(SDL_LDFLAGS)
+  LDFLAGS   += -s $(SDL_LDFLAGS)
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
@@ -78,9 +78,6 @@ OBJECTS := \
 	$(OBJDIR)/indexcb.o \
 	$(OBJDIR)/calc.o \
 	$(OBJDIR)/state.o \
-	$(OBJDIR)/exportvar.o \
-	$(OBJDIR)/gif.o \
-	$(OBJDIR)/gifhandle.o \
 	$(OBJDIR)/label.o \
 	$(OBJDIR)/savestate.o \
 	$(OBJDIR)/sendfile.o \
@@ -173,15 +170,6 @@ $(OBJDIR)/calc.o: ../interface/calc.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/state.o: ../interface/state.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/exportvar.o: ../utilities/exportvar.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/gif.o: ../utilities/gif.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/gifhandle.o: ../utilities/gifhandle.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(CFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/label.o: ../utilities/label.c

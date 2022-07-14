@@ -10,8 +10,6 @@
 #include "86hw.h"
 #include "device.h"
 #include "var.h"
-#include "gif.h"
-#include "gifhandle.h"
 #include "link.h"
 #include "keys.h"
 
@@ -681,25 +679,10 @@ int calc_run_tstates(LPCALC lpCalc, time_t tstates) {
 
 BOOL calc_start_screenshot(calc_t *calc, const TCHAR *filename)
 {
-	if (gif_write_state == GIF_IDLE)
-	{
-		gif_write_state = GIF_START;
-#ifdef _WINDOWS
-		StringCbCopy(gif_file_name, MAX_PATH, filename);
-#else
-		_tcscpy_s(gif_file_name, filename);
-#endif
-		return TRUE;
-	}
-	else
-	{
-		return FALSE;
-	}
 }
 
 void calc_stop_screenshot(LPCALC calc)
 {
-	gif_write_state = GIF_END;
 }
 
 void calc_pause_linked() {
@@ -779,7 +762,6 @@ int calc_run_all(void) {
 		//this code handles screenshoting if were actually taking screenshots right now
 		if (active_calc >= 0 && !calc_waiting_link && calcs[active_calc].cpu.timer_c != NULL && calcs[active_calc].cpu.pio.lcd != NULL &&
 				((tc_elapsed(calcs[active_calc].cpu.timer_c) - calcs[active_calc].cpu.pio.lcd->lastgifframe) >= 0.01)) {
-			handle_screenshot();
 			calcs[active_calc].cpu.pio.lcd->lastgifframe += 0.01;
 		}
 	}

@@ -24,10 +24,10 @@ RUN set -ex; \
 
 
 
-#ENV PATH="/opt/emsdk:/opt/emsdk/node/14.18.2_64bit/bin:/opt/emsdk/upstream/emscripten:$PATH"
-#ENV EMSDK=/opt/emsdk
-#ENV EM_CONFIG=/opt/emsdk/.emscripten
-#ENV EMSDK_NODE=/opt/emsdk/node/14.18.2_64bit/bin/node
+ENV PATH="/opt/emsdk:/opt/emsdk/node/14.18.2_64bit/bin:/opt/emsdk/upstream/emscripten:$PATH"
+ENV EMSDK=/opt/emsdk
+ENV EM_CONFIG=/opt/emsdk/.emscripten
+ENV EMSDK_NODE=/opt/emsdk/node/14.18.2_64bit/bin/node
 
 RUN set -ex; \
     mkdir -p /opt/src; \
@@ -35,7 +35,7 @@ RUN set -ex; \
 
 WORKDIR /opt/src
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential wx*
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libsdl2-dev
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y x11-xserver-utils

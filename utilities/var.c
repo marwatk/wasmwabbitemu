@@ -682,7 +682,7 @@ TIFILE_t* newimportvar(LPCTSTR filePath, BOOL only_check_header) {
 #ifdef WINVER
 	_tfopen_s(&infile, filePath, _T("rb"));
 #else
-	infile = fopen(wxFNCONV(filePath), "rb");
+	infile = fopen(filePath, "rb");
 #endif
 	if (infile == NULL) 
 		return FreeTiFile(tifile);

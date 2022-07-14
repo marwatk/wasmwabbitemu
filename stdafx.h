@@ -71,11 +71,11 @@ typedef std::string tstring;
 #include <stddef.h>
 #include <time.h>
 #include <ctype.h>
+#include <cwchar>
 #ifdef _UNICODE
 #include <wchar.h>
 #endif
 #ifdef WXVER
-#include <wx/wx.h>
 #undef _T
 #endif
 
@@ -110,7 +110,7 @@ typedef wchar_t *LPTSTR;
 #define _T(z) z
 #define TCHAR char
 typedef const char *LPCTSTR;
-typedef char *LPCTSTR;
+typedef char *LPTSTR;
 
 #define _tprintf_s _tprintf
 #define _tprintf sprintf

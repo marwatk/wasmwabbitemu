@@ -1,7 +1,10 @@
 #include "stdafx.h"
 #include "keys.h"
 #if WXVER
-#include <wx/wx.h>
+#endif
+
+#ifdef SDL
+#include <SDL.h>
 #endif
 
 #ifdef MACVER
@@ -605,10 +608,93 @@ keyprog_t keygrps[256] = {
 	//{ VK_OEM_2, 2, 0 },
 	{ WXK_F12, KEYGROUP_ON, KEYBIT_ON},
 #endif
+#ifdef SDL
+	{ 'A' , 5 , 6 },
+	{ 'B' , 4 , 6 },
+	{ 'C' , 3 , 6 },
+	{ 'D' , 5 , 5 },
+	{ 'E' , 4 , 5 },
+	{ 'F' , 3 , 5 },
+	{ 'G' , 2 , 5 },
+	{ 'H' , 1 , 5 },
+	{ 'I' , 5 , 4 },
+	{ 'J' , 4 , 4 },
+	{ 'K' , 3 , 4 },
+	{ 'L' , 2 , 4 },
+	{ 'M' , 1 , 4 },
+	{ 'N' , 5 , 3 },
+	{ 'O' , 4 , 3 },
+	{ 'P' , 3 , 3 },
+	{ 'Q' , 2 , 3 },
+	{ 'R' , 1 , 3 },
+	{ 'S' , 5 , 2 },
+	{ 'T' , 4 , 2 },
+	{ 'U' , 3 , 2 },
+	{ 'V' , 2 , 2 },
+	{ 'W' , 1 , 2 },
+	{ 'X' , 5 , 1 },
+	{ 'Y' , 4 , 1 },
+	{ 'Z' , 3 , 1 },
+	{ ' ' , 4 , 0 },
+	{ SDLK_DOWN , 0 , 0 },
+	{ SDLK_LEFT , 0 , 1 },
+	{ SDLK_RIGHT , 0 , 2 },
+	{ SDLK_UP , 0 , 3 },
+	{ '0' , 4 , 0 },
+	{ '1' , 4 , 1 },
+	{ '2' , 3 , 1 },
+	{ '3' , 2 , 1 },
+	{ '4' , 4 , 2 },
+	{ '5' , 3 , 2 },
+	{ '6' , 2 , 2 },
+	{ '7' , 4 , 3 },
+	{ '8' , 3 , 3 },
+	{ '9' , 2 , 3 },
+	{ SDLK_RETURN , 1 , 0 },
+	{ SDLK_KP_DECIMAL , 3 , 0 },
+	{ ',', 4 , 4 },
+	{ SDLK_KP_PLUS , 1 , 1 },
+	{ SDLK_KP_MINUS , 1 , 2 },
+	{ SDLK_KP_MULTIPLY , 1 , 3 },
+	{ SDLK_KP_DIVIDE , 1 , 4 },
+	{ '[' , 3 , 4 },
+	{ ']' , 2 , 4 },
+	{ SDLK_F1 , 6 , 4 },
+	{ SDLK_F2 , 6 , 3 },
+	{ SDLK_F3 , 6 , 2 },
+	{ SDLK_F4 , 6 , 1 },
+	{ SDLK_F5 , 6 , 0 },
+	{ SDLK_ESCAPE , 6 , 6 },
+	{ 0 , 6 , 5 },			// l shift
+	{ SDLK_RCTRL, 5 , 7 },			// l control
+	{ 0 , 1 , 6 },
+	{ '-', 2 , 0 },
+	{ SDLK_KP_EQUALS , 4 , 7 },
+	//{ VK_PRIOR , 4 , 6 },
+	//{ VK_NEXT , 3 , 6 },
+	{ SDLK_INSERT , 2 , 6 },
+	{ SDLK_DELETE , 6 , 7 },
+	{ SDLK_HOME , 5 , 6 },
+	{ SDLK_END , 3 , 7 },
+	{ SDLK_KP_0 , 4 , 0 },
+	{ SDLK_KP_1 , 4 , 1 },
+	{ SDLK_KP_2 , 3 , 1 },
+	{ SDLK_KP_3 , 2 , 1 },
+	{ SDLK_KP_4 , 4 , 2 },
+	{ SDLK_KP_5 , 3 , 2 },
+	{ SDLK_KP_6 , 2 , 2 },
+	{ SDLK_KP_7 , 4 , 3 },
+	{ SDLK_KP_8 , 3 , 3 },
+	{ SDLK_KP_9 , 2 , 3 },
+	{ SDLK_KP_DECIMAL , 3 , 0 },
+	//{ VK_OEM_2, 2, 0 },
+	{ SDLK_F12, KEYGROUP_ON, KEYBIT_ON},
+#endif
+
 	{ -1, -1, -1},
 };
 #endif
-	
+
 keypad_t *keypad_init(CPU_t *cpu) {
 	keypad_t *keypad;
 	

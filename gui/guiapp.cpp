@@ -1,3 +1,4 @@
+#include <iostream>
 #include "guiapp.h"
 #include "gui.h"
 #include "sendfile.h"
@@ -13,7 +14,7 @@ SDL_Window *window = NULL;      // Pointer for the window
 
 //IMPLEMENT_APP(WabbitemuApp)
 
-#define ROM_FILE L"z.rom"
+#define ROM_FILE "z.rom"
 
 bool WabbitemuApp::init() {
 	LPCALC lpCalc = calc_slot_new();
@@ -114,36 +115,10 @@ void WabbitemuApp::tick() {
 		//std::cout << "WXK_UP: " << WXK_UP << "\n";
 		//std::cout << "WXK_DOWN: " << WXK_DOWN << "\n";
 		if( e.type == SDL_KEYDOWN ) {
-			switch( e.key.keysym.sym )
-			{
-				case SDLK_UP:
-				keyDown(315); //WXK_UP);
-				printf( "UP!\n" );
-				break;
-
-				case SDLK_DOWN:
-				keyDown(317); //WXK_DOWN);
-				printf( "DOWN!\n" );
-				break;
-
-				default:
-				break;
-			}
+			keyDown(e.key.keysym.sym);
 		}
 		if( e.type == SDL_KEYUP ) {
-			switch( e.key.keysym.sym )
-			{
-				case SDLK_UP:
-				keyUp(315); // WSK_UP;
-				break;
-
-				case SDLK_DOWN:
-				keyUp(317); // WXK_DOWN);
-				break;
-
-				default:
-				break;
-			}
+			keyUp(e.key.keysym.sym);
 		}
     }
 }
