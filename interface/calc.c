@@ -255,11 +255,14 @@ void check_bootfree_and_update(LPCALC lpCalc) {
 }
 
 BOOL rom_load(LPCALC lpCalc, LPCTSTR FileName) {
+	printf("Filename: %s\n", FileName);
 	if (lpCalc == NULL) {
+		puts("lpCalc was null\n");
 		return FALSE;
 	}
 	TIFILE_t* tifile = newimportvar(FileName, FALSE);
 	if (tifile == NULL) {
+		puts("tifile was null\n");
 		return FALSE;
 	}
 

@@ -53,7 +53,6 @@ COPY . /opt/src/
 RUN set -ex; \
     env; \
     emmake make -j8; \
-    cp /opt/src/z.rom /opt/src/bin/; \
     : ;
 
 ENV DISPLAY=:1
