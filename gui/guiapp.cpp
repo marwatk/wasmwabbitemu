@@ -3,6 +3,9 @@
 #include "gui.h"
 #include "sendfile.h"
 
+#include <emscripten.h>
+#include <emscripten/html5.h>
+
 unsigned char redColors[MAX_SHADES+1];
 unsigned char greenColors[MAX_SHADES+1];
 unsigned char blueColors[MAX_SHADES+1];
@@ -21,14 +24,17 @@ bool WabbitemuApp::init() {
 	
 	int result = rom_load(lpCalc, lpCalc->rom_path);
 	if (result == TRUE) {
+		puts("First load worked\n");
 	} else {
 		calc_slot_free(lpCalc);
 		BOOL loadedRom = FALSE;
 		
 		if (rom_load(lpCalc, ROM_FILE)) {
+			puts("Second load worked\n");
 			loadedRom = TRUE;
 		}
 		if (!loadedRom) {
+			puts("Load failed\n");
 			return FALSE;
 		}
 	}
@@ -190,11 +196,44 @@ void WabbitemuApp::FinalizeButtons() {
 	}
 }
 
-int main(int argc, char * argv[]){
-	WabbitemuApp app;
-	app.init();
-	while(true){
-        SDL_Delay(10);  // setting some Delay
-		app.tick();
-    }
+WabbitemuApp app;
+
+EM_BOOL loop(double time, void* userData) {
+  app.tick();
+  //puts("Looping\n");
+  // Return true to keep the loop running.
+  return EM_TRUE;
 }
+
+void test() {
+  FILE *file = fopen("test.txt", "rb");
+  if (!file) {
+    printf("cannot open file\n");
+    return;
+  }
+  while (!feof(file)) {
+    char c = fgetc(file);
+    if (c != EOF) {
+      putchar(c);
+    }
+  }
+  fclose (file);
+}
+
+int main(int argc, char * argv[]){
+	printf("Pre app\n");
+	if (!app.init()) {
+		puts("Init failed\n");
+		return 1;
+	}
+	printf("Post init\n");
+	emscripten_request_animation_frame_loop(loop, 0);
+	//test();
+	
+	
+	//while(true){
+    //    SDL_Delay(10);  // setting some Delay
+	//	app.tick();
+	//}
+}
+
