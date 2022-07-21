@@ -262,6 +262,20 @@ button.arrow-button,
   grid-column: 1 / 6;
 }
 
+canvas {
+  width: 100%;
+  height: 100%;
+}
+
+#controls {
+  display: none;
+}
+#status {
+  display: none;
+}
+#output {
+  display: none;
+}
 
     </style>
   </head>
@@ -359,10 +373,6 @@ button.arrow-button,
 
     <textarea id="output" rows="8"></textarea>
 
-    <div id="keypad">
-
-    </div>
-
     <script type='text/javascript'>
       var calcInputs = [];
       var statusElement = document.getElementById('status');
@@ -376,23 +386,30 @@ button.arrow-button,
         return calcInputs.shift();
       }
 
+      function inputToBit(input) {
+        return input & 0xFF;
+      }
+      function inputToGroup(input) {
+        return (input & 0xFF00) >> 16;
+      }
+
       function keypadEvent(event, up) {
-        id = event.target.id;
+        var id = event.currentTarget.id;
         if (id.length != 3) {
-            console.log(`id ${id} is not proper length`);
+            console.log(`id [${id}] is not proper length`);
             return;
         }
-        if (id.length[0] != "k") {
+        if (id[0] != "k") {
             console.log(`id ${id} doesn't start with k`);
             return;
         }
-        group = parseInt(id[1]);
-        bit = parseInt(id[2]);
+        var group = parseInt(id[1]) & 0xFF;
+        var bit = parseInt(id[2]) & 0xFF;
         input = 0x20000;
         if (up) {
             input |= 0x10000;
         }
-        input |= (group << 16);
+        input |= (group << 8);
         input |= bit;
         calcInputs.push(input);
       }
@@ -405,11 +422,15 @@ button.arrow-button,
       }
 
       function addKeypadHandlers() {
-        var buttons = document.getElementsByName("button")
+        var buttons = document.getElementsByTagName("button");
+        console.log("Num buttons: " + buttons.length);
         for (let i = 0; i < buttons.length; i++) {
           if ( buttons[i].id[0] == "k" ) {
             buttons[i].addEventListener("mousedown", keypadDown);
             buttons[i].addEventListener("mouseup", keypadUp);
+          }
+          else {
+            console.log("Element id [" + buttons[i].id + "] doesn't start with k");
           }
         }
       }

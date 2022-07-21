@@ -52,6 +52,7 @@ RUN set -ex; \
 COPY . /opt/src/
 RUN set -ex; \
     env; \
+    cp TI85.ROM build/z.rom; \
     emmake make -j8; \
     cp -v index.html bin/; \
     : ;
@@ -59,5 +60,5 @@ RUN set -ex; \
 ENV DISPLAY=:1
 ENV HOME=/root
 
-CMD ["bash", "-c", "busybox httpd -p 8080 -h /opt/src/bin -f"]
+CMD ["busybox", "httpd", "-p", "8080", "-h", "/opt/src/bin", "-f"]
 #CMD ["bash", "-c", "tightvncserver; DISPLAY=:1 bin/wxWabbitemu z.rom"]

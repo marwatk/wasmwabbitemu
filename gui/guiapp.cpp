@@ -28,16 +28,18 @@ int charToInt(char c) {
 }
 
 bool fetchCalcInput(js_key *key) {
-	int input = EM_ASM_INT(return fetchCalcInput());
+	uint input = EM_ASM_INT(return fetchCalcInput());
 	if (input == 0) {
 		return false;
 	}
+	uint bit = input & 0xFF;
+	uint group = (input & 0xFF00) >> 8;
+	bool up = ((input & 0x10000) >> 16) != 0;
+	printf("Input: %d, Bit: %d, Group: %d, Up: %d\n", input, bit, group, up);
 
-	input = input & 0x1FFFF;
-	key->bit = input & 0xFF;
-	key->group = (input & 0xFF00) >> 8;
-	key->up = ((input & 0x10000) >> 16) != 0;
-	printf("Input: %d, Bit: %d, Group: %d, Up: %d\n", input, key->bit, key->group, key->up);
+	key->bit = bit;
+	key->group = group;
+	key->up = up;
 	return true;
 }
 
@@ -171,8 +173,8 @@ void WabbitemuApp::tick() {
 	}
 
 	SDL_Event e;
-    while (SDL_PollEvent(&e)) {  // poll until all events are handled!
-        std::cout << "Got SDL event\n";
+	while (SDL_PollEvent(&e)) {  // poll until all events are handled!
+    //std::cout << "Got SDL event\n";
 		//std::cout << "WXK_UP: " << WXK_UP << "\n";
 		//std::cout << "WXK_DOWN: " << WXK_DOWN << "\n";
 		if( e.type == SDL_KEYDOWN ) {
@@ -181,7 +183,7 @@ void WabbitemuApp::tick() {
 		if( e.type == SDL_KEYUP ) {
 			keyUp(e.key.keysym.sym);
 		}
-    }
+  }
 
 	js_key jsKey;
 	if (fetchCalcInput(&jsKey)) {
@@ -282,6 +284,10 @@ EM_BOOL loop(double time, void* userData) {
   return EM_TRUE;
 }
 
+void voidLoop() {
+	app.tick();
+}
+
 void test() {
   FILE *file = fopen("test.txt", "rb");
   if (!file) {
@@ -304,6 +310,7 @@ int main(int argc, char * argv[]){
 		return 1;
 	}
 	printf("Post init\n");
+	//emscripten_set_main_loop(voidLoop, 0, false);
 	emscripten_request_animation_frame_loop(loop, 0);
 	//test();
 	
