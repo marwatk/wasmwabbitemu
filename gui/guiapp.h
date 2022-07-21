@@ -4,6 +4,14 @@
 
 #include <SDL.h>
 
+typedef struct js_key {
+	bool up;
+	int group;
+	int bit;
+} js_key;
+
+void jsKey(bool up, int group, int bit);
+
 #define MAX_FILES 255
 typedef struct ParsedCmdArgs
 {

@@ -53,6 +53,7 @@ COPY . /opt/src/
 RUN set -ex; \
     env; \
     emmake make -j8; \
+    cp -v index.html bin/; \
     : ;
 
 ENV DISPLAY=:1

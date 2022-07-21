@@ -15,9 +15,64 @@ LPCALC theCalc;
 SDL_Renderer *renderer = NULL;      // Pointer for the renderer
 SDL_Window *window = NULL;      // Pointer for the window
 
-//IMPLEMENT_APP(WabbitemuApp)
+#define MAX_KEYPRESSES 10
+int numKeypresses = 0;
+int inkeyPressIdx = 0;
+int outkeyPressIdx = 0;
+js_key keyQueue[MAX_KEYPRESSES];
 
 #define ROM_FILE "z.rom"
+
+int charToInt(char c) {
+	return c - 48;
+}
+
+bool fetchCalcInput(js_key *key) {
+	int input = EM_ASM_INT(return fetchCalcInput());
+	if (input == 0) {
+		return false;
+	}
+
+	input = input & 0x1FFFF;
+	key->bit = input & 0xFF;
+	key->group = (input & 0xFF00) >> 8;
+	key->up = ((input & 0x10000) >> 16) != 0;
+	printf("Input: %d, Bit: %d, Group: %d, Up: %d\n", input, key->bit, key->group, key->up);
+	return true;
+}
+
+void jsKey(bool up, int group, int bit) {
+	// I don't _think_ we need locking, but may need to investigate.
+	if (numKeypresses >= MAX_KEYPRESSES) {
+		puts("Discarding keys over threshhold\n");
+		return;
+	}
+
+	keyQueue[inkeyPressIdx].up = up;
+	keyQueue[inkeyPressIdx].group = group;
+	keyQueue[inkeyPressIdx].bit = bit;
+
+	inkeyPressIdx++;
+	if (inkeyPressIdx >= MAX_KEYPRESSES) {
+		inkeyPressIdx = 0;
+	}
+	numKeypresses++;
+}
+
+bool consumeJsKey(js_key *key) {
+	if (numKeypresses <= 0) {
+		return false;
+	}
+	key->up = keyQueue[outkeyPressIdx].up;
+	key->group = keyQueue[outkeyPressIdx].group;
+	key->bit = keyQueue[outkeyPressIdx].bit;
+	outkeyPressIdx++;
+	if (outkeyPressIdx >= MAX_KEYPRESSES) {
+		outkeyPressIdx = 0;
+	}
+	numKeypresses--;
+	return true;
+}
 
 bool WabbitemuApp::init() {
 	LPCALC lpCalc = calc_slot_new();
@@ -127,6 +182,28 @@ void WabbitemuApp::tick() {
 			keyUp(e.key.keysym.sym);
 		}
     }
+
+	js_key jsKey;
+	if (fetchCalcInput(&jsKey)) {
+		keypad_t *kp = theCalc->cpu.pio.keypad;
+		int group = jsKey.group;
+		int bit = jsKey.bit;
+		if(jsKey.up) {
+			kp->keys[group][bit] &= ~(KEY_MOUSEPRESS | KEY_STATEDOWN);
+			if (group == 0x05 && bit == 0x00) {
+				theCalc->cpu.pio.keypad->on_pressed &= ~KEY_MOUSEPRESS;
+			}
+		} else {
+			if (group == 0x05 && bit == 0x00) {
+				theCalc->cpu.pio.keypad->on_pressed |= KEY_MOUSEPRESS;
+			} else {
+				kp->keys[group][bit] |= KEY_MOUSEPRESS;
+				if ((kp->keys[group][bit] & KEY_STATEDOWN) == 0) {
+					kp->keys[group][bit] |= KEY_STATEDOWN;
+				}
+			}
+		}
+	}
 }
 
 void WabbitemuApp::render() {
@@ -236,4 +313,5 @@ int main(int argc, char * argv[]){
 	//	app.tick();
 	//}
 }
+
 

@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>wasmWabbitemu1</title>
+    <style>
+      body {
+        font-family: arial;
+        margin: 0;
+        padding: none;
+      }
+
+      .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
+      div.emscripten { text-align: center; }      
+      div.emscripten_border { border: 1px solid black; }
+      /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+      canvas.emscripten { border: 0px none; background-color: black; }
+
+      #emscripten_logo {
+        display: inline-block;
+        margin: 0;
+      }
+
+      .spinner {
+        height: 30px;
+        width: 30px;
+        margin: 0;
+        margin-top: 20px;
+        margin-left: 20px;
+        display: inline-block;
+        vertical-align: top;
+
+        -webkit-animation: rotation .8s linear infinite;
+        -moz-animation: rotation .8s linear infinite;
+        -o-animation: rotation .8s linear infinite;
+        animation: rotation 0.8s linear infinite;
+
+        border-left: 5px solid rgb(235, 235, 235);
+        border-right: 5px solid rgb(235, 235, 235);
+        border-bottom: 5px solid rgb(235, 235, 235);
+        border-top: 5px solid rgb(120, 120, 120);
+        
+        border-radius: 100%;
+        background-color: rgb(189, 215, 46);
+      }
+
+      @-webkit-keyframes rotation {
+        from {-webkit-transform: rotate(0deg);}
+        to {-webkit-transform: rotate(360deg);}
+      }
+      @-moz-keyframes rotation {
+        from {-moz-transform: rotate(0deg);}
+        to {-moz-transform: rotate(360deg);}
+      }
+      @-o-keyframes rotation {
+        from {-o-transform: rotate(0deg);}
+        to {-o-transform: rotate(360deg);}
+      }
+      @keyframes rotation {
+        from {transform: rotate(0deg);}
+        to {transform: rotate(360deg);}
+      }
+
+      #status {
+        display: inline-block;
+        vertical-align: top;
+        margin-top: 30px;
+        margin-left: 20px;
+        font-weight: bold;
+        color: rgb(120, 120, 120);
+      }
+
+      #progress {
+        height: 20px;
+        width: 300px;
+      }
+
+      #controls {
+        display: inline-block;
+        float: right;
+        vertical-align: top;
+        margin-top: 30px;
+        margin-right: 20px;
+      }
+
+      #output {
+        width: 100%;
+        height: 200px;
+        margin: 0 auto;
+        margin-top: 10px;
+        border-left: 0px;
+        border-right: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+        display: block;
+        background-color: black;
+        color: white;
+        font-family: 'Lucida Console', Monaco, monospace;
+        outline: none;
+      }
+
+
+
+
+
+
+
+      *{
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+#calc {
+  background-color: black;
+  max-width: 500px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  height: 100%;
+  grid-gap: 2px;
+}
+
+.calc button {
+  width: 100%;
+  min-height: 2.5em;
+}
+
+button.function {
+  padding-bottom: 2em;
+  vertical-align: top;
+}
+
+.arrow-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding: 0;
+  grid-column-end: span 2;
+  grid-row-end: span 2;
+}
+
+.calc .arrow-buttons button {
+  height: 1.5em;
+  min-height: 1.5em;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+<button id="k00" class="button"><div class='labels'></div><div class='key'></div></button>
+*/
+.arrow-buttons .arrow-down {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.arrow-buttons .arrow-left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.arrow-buttons .arrow-right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.arrow-buttons .arrow-up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.key {
+  background-color: gray;
+  color: white;
+  margin: 5px;
+  border-radius: 5px;
+  clear: both;
+  min-height: 2em;
+  line-height: 2em;
+  height: 1fr;
+}
+
+.labels {
+  display: block;
+  width: 100%;
+}
+
+.alpha {
+  color: lightblue;
+}
+
+.second {
+  color: #FC0;
+}
+
+.labels::before {
+  color: #FC0;
+  float: left;
+  padding-left: 5px;
+}
+
+.labels::after {
+  color: lightblue;
+  text-align: right;
+  float: right;
+  padding-right: 5px;
+}
+
+button.non-arrow {
+  min-height: 3em;
+  display: block;
+  height: 100%;
+  background-color: black;
+  border: 0;
+}
+
+button.non-arrow .key::before { content: "und"; }
+button.non-arrow .labels::before { content: "und"; }
+button.non-arrow .labels::after { content: "und"; }
+
+.ti85 #k54 .key::before { content: "F0"; }
+.ti85 #k54 .labels::before { content: "B1"; }
+.ti85 #k54 .labels::after { content: "A1"; }
+
+
+.calc button:active {
+  background-color: white;
+}
+
+.calc button:active .key {
+  background-color: red;
+}
+
+button.arrow-button,
+.button button.ten-key {
+  color: white;
+  background-color: grey;
+}
+
+.button button.toggle-alpha {
+  background-color: lightblue;
+}
+
+.button button.toggle-second {
+  background-color: #FC0;
+  color: black;
+}
+
+.lcd {
+  aspect-ratio: 60 / 40;
+  min-height: 40px;
+  background-color: lightcoral;
+  grid-column: 1 / 6;
+}
+
+.title-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  color: white;
+  grid-column: 1 / 6;
+}
+
+
+    </style>
+  </head>
+  <body>
+    <div class="spinner" id='spinner'></div>
+    <div class="emscripten" id="status">Downloading...</div>
+
+<span id='controls'>
+  <span><input type="checkbox" id="resize">Resize canvas</span>
+  <span><input type="checkbox" id="pointerLock" checked>Lock/hide mouse pointer &nbsp;&nbsp;&nbsp;</span>
+  <span><input type="button" value="Fullscreen" onclick="Module.requestFullscreen(document.getElementById('pointerLock').checked, 
+                                                                            document.getElementById('resize').checked)">
+  </span>
+</span>
+
+    <div class="emscripten">
+      <progress value="0" max="100" id="progress" hidden=1></progress>
+    </div>
+    
+    <div id='calc' class='calc ti85'>
+      <div class="title-bar">
+        <div class="branding">
+          <span>Texas Instruments</span>
+        </div>
+        <div class="model-info">
+          <span>TI-85</span>
+        </div>
+      </div>
+      <div class="lcd">
+        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+      </div>
+      <button id='k64' class='button non-arrow function'><div class='labels'></div><div class='key'></div></button>
+      <button id='k63' class='button non-arrow function'><div class='labels'></div><div class='key'></div></button>
+      <button id='k62' class='button non-arrow function'><div class='labels'></div><div class='key'></div></button>
+      <button id='k61' class='button non-arrow function'><div class='labels'></div><div class='key'></div></button>
+      <button id='k60' class='button non-arrow function'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k65' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k66' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k67' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <div class="arrow-buttons">
+        <button id='k03' class="button arrow-button arrow-up">&#11165;</button>
+        <button id='k01' class="button arrow-button arrow-left">&#11164;</button>
+        <button id='k02' class="button arrow-button arrow-right">&#11166;</button>
+        <button id='k00' class="button arrow-button arrow-down">&#11167;</button>
+      </div>
+
+      <button id='k57' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k47' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k37' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k56' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k46' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k36' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k26' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k16' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k55' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k45' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k35' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k25' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k15' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k54' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k44' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k34' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k24' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k14' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k53' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k43' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k33' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k23' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k13' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k52' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k42' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k32' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k22' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k12' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k51' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k41' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k31' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k21' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k11' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k50' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k40' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k30' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k20' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k10' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+    </div>
+
+    <textarea id="output" rows="8"></textarea>
+
+    <div id="keypad">
+
+    </div>
+
+    <script type='text/javascript'>
+      var calcInputs = [];
+      var statusElement = document.getElementById('status');
+      var progressElement = document.getElementById('progress');
+      var spinnerElement = document.getElementById('spinner');
+      
+      function fetchCalcInput() {
+        if(calcInputs.length == 0) {
+            return 0;
+        }
+        return calcInputs.shift();
+      }
+
+      function keypadEvent(event, up) {
+        id = event.target.id;
+        if (id.length != 3) {
+            console.log(`id ${id} is not proper length`);
+            return;
+        }
+        if (id.length[0] != "k") {
+            console.log(`id ${id} doesn't start with k`);
+            return;
+        }
+        group = parseInt(id[1]);
+        bit = parseInt(id[2]);
+        input = 0x20000;
+        if (up) {
+            input |= 0x10000;
+        }
+        input |= (group << 16);
+        input |= bit;
+        calcInputs.push(input);
+      }
+
+      function keypadDown(event) {
+        keypadEvent(event, false);
+      }
+      function keypadUp(event) {
+        keypadEvent(event, true);
+      }
+
+      function addKeypadHandlers() {
+        var buttons = document.getElementsByName("button")
+        for (let i = 0; i < buttons.length; i++) {
+          if ( buttons[i].id[0] == "k" ) {
+            buttons[i].addEventListener("mousedown", keypadDown);
+            buttons[i].addEventListener("mouseup", keypadUp);
+          }
+        }
+      }
+
+      addKeypadHandlers();
+
+      var Module = {
+        preRun: [],
+        postRun: [],
+        print: (function() {
+          var element = document.getElementById('output');
+          if (element) element.value = ''; // clear browser cache
+          return function(text) {
+            if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+            // These replacements are necessary if you render to raw HTML
+            //text = text.replace(/&/g, "&amp;");
+            //text = text.replace(/</g, "&lt;");
+            //text = text.replace(/>/g, "&gt;");
+            //text = text.replace('\n', '<br>', 'g');
+            console.log(text);
+            if (element) {
+              element.value += text + "\n";
+              element.scrollTop = element.scrollHeight; // focus on bottom
+            }
+          };
+        })(),
+        canvas: (function() {
+          var canvas = document.getElementById('canvas');
+
+          // As a default initial behavior, pop up an alert when webgl context is lost. To make your
+          // application robust, you may want to override this behavior before shipping!
+          // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
+          canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+
+          return canvas;
+        })(),
+        setStatus: function(text) {
+          if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+          if (text === Module.setStatus.last.text) return;
+          var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+          var now = Date.now();
+          if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+          Module.setStatus.last.time = now;
+          Module.setStatus.last.text = text;
+          if (m) {
+            text = m[1];
+            progressElement.value = parseInt(m[2])*100;
+            progressElement.max = parseInt(m[4])*100;
+            progressElement.hidden = false;
+            spinnerElement.hidden = false;
+          } else {
+            progressElement.value = null;
+            progressElement.max = null;
+            progressElement.hidden = true;
+            if (!text) spinnerElement.style.display = 'none';
+          }
+          statusElement.innerHTML = text;
+        },
+        totalDependencies: 0,
+        monitorRunDependencies: function(left) {
+          this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+        }
+      };
+      Module.setStatus('Downloading...');
+      window.onerror = function(event) {
+        // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
+        Module.setStatus('Exception thrown, see JavaScript console');
+        spinnerElement.style.display = 'none';
+        Module.setStatus = function(text) {
+          if (text) console.error('[post-exception status] ' + text);
+        };
+      };
+    </script>
+    <script async type="text/javascript" src="wxWabbitemu.js"></script>
+  </body>
+</html>
+
