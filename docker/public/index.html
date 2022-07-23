@@ -431,6 +431,10 @@ canvas {
                                                                                   document.getElementById('resize').checked)">
         </span>
       </span>
+      <p>ROM Selection:</p>
+      <select id="rom">
+        <option value="">Choose ROM</option>
+      </select>
       <p>Emulator Log:</p>
       <textarea id="output" rows="8" readonly></textarea>
     </div>
@@ -516,10 +520,17 @@ canvas {
       var romSet = false;
       var romPathPointer = 0;
       var calcInputs = [];
+      var browserRoms = [];
+      var serverRoms = [];
       var statusElement = document.getElementById('status');
       var progressElement = document.getElementById('progress');
       var spinnerElement = document.getElementById('spinner');
       
+      function calcLoaded() {
+        log("Calc loaded!");
+        document.getElementById("menu").style.display = "none";
+      }
+
       function fetchCalcInput() {
         if(calcInputs.length == 0) {
             return 0;
@@ -528,7 +539,7 @@ canvas {
       }
 
       function setRomPathPointer(pointer) {
-        console.log(`Rom path pointer: ${pointer}`);
+        log(`Rom path pointer: ${pointer}`);
         romPathPointer = pointer;
       }
 
@@ -542,11 +553,11 @@ canvas {
       function keypadEvent(event, up) {
         var id = event.currentTarget.id;
         if (id.length != 3) {
-            console.log(`id [${id}] is not proper length`);
+            log(`id [${id}] is not proper length`);
             return;
         }
         if (id[0] != "k") {
-            console.log(`id ${id} doesn't start with k`);
+            log(`id ${id} doesn't start with k`);
             return;
         }
         var group = parseInt(id[1]) & 0xFF;
@@ -567,18 +578,45 @@ canvas {
         keypadEvent(event, true);
       }
 
+      function initRom() {
+        var files = Object.keys(FS.lookupPath("/idbfs").node.contents);
+        var file;
+        var lastRom = "";
+        var i;
+        for( i = 0; i < files.length; i++ ) {
+          file = files[i];
+          if (file == "lastrom.txt") {
+            lastRom = FS.readFile("/idbfs/" + file, { encoding: "utf8" });
+          }
+          else {
+            browserRoms.push(file);
+          }
+        }
+        for( i = 0; i < browserRoms.length; i++ ) {
+          if( lastRom == browserRoms[i] ) {
+            setRomPath("/idbfs/" + lastRom);
+          }
+        }
+        updateRomList();
+      }
+
+      function setRomPath(romPath) {
+        stringToUTF8(romPath, romPathPointer, 2048);
+      }
+
       function mainJs() {
         log("main() has started");
-        console.log("Creating IDBFS filesystem");
+        log("Creating IDBFS filesystem");
         Module.syncing = true;
-        FS.mkdir('/roms');
-        FS.mount(IDBFS, {}, '/roms');
+        FS.mkdir('/idbfs');
+        FS.mount(IDBFS, {}, '/idbfs');
         FS.syncfs(true, function (err) {
           Module.syncing = false;
           if ( err ) {
-            console.log("Error syncing idbfs: " + err);
+            log("Error loading idbfs: " + err);
           } else {
-            console.log("IDBFS filesystem synced");
+            log("IDBFS filesystem loaded");
+            initRom();
           }
         });
       }
@@ -595,28 +633,83 @@ canvas {
         FS.syncfs(function (err) {
           Module.syncing = false;
           if ( err ) {
-            console.log("Error syncing idbfs: " + err);
+            log("Error syncing idbfs: " + err);
           } else {
-            console.log("IDBFS filesystem synced");
+            log("IDBFS filesystem synced");
           }
         });
       }
 
+      async function fetchServerRoms() {
+        var response = await fetch("/romlist.txt");
+        var i;
+        var roms;
+        var rom;
+        if (!response.ok) {
+          return;
+        }
+        const text = await response.text();
+        roms = text.split("\n");
+        for( i = 0; i < roms.length; i++ ) {
+          rom = roms[i];
+          if ( rom.length > 0 ) { 
+            serverRoms.push(rom);
+          }  
+        }
+        updateRomList();
+      }
+
+      function fetchToIdbfs(url) {
+
+      }
+
+      function readTextFile(name) {
+        
+      }
+
+      function writeTextFile(name, content) {
+
+      }
+
       function addKeypadHandlers() {
         var buttons = document.getElementsByTagName("button");
-        console.log("Num buttons: " + buttons.length);
+        log("Num buttons: " + buttons.length);
         for (let i = 0; i < buttons.length; i++) {
           if ( buttons[i].id[0] == "k" ) {
             buttons[i].addEventListener("mousedown", keypadDown);
             buttons[i].addEventListener("mouseup", keypadUp);
           }
           else {
-            console.log("Element id [" + buttons[i].id + "] doesn't start with k");
+            log("Element id [" + buttons[i].id + "] doesn't start with k");
           }
         }
       }
 
       addKeypadHandlers();
+      fetchServerRoms();
+
+      function updateRomList() {
+        var select = document.getElementById("rom");
+        var i;
+        var option;
+        while( select.length > 1 ) {
+          select.remove(1);
+        }
+        serverRoms.sort();
+        browserRoms.sort();
+        for( i = 0; i < browserRoms.length; i++ ) {
+          option = document.createElement("option");
+          option.text = browserRoms[i];
+          option.value = browserRoms[i];
+          select.add(option);
+        }
+        for( i = 0; i < serverRoms.length; i++ ) {
+          option = document.createElement("option");
+          option.text = serverRoms[i];
+          option.value = serverRoms[i];
+          select.add(option);
+        }
+      }
 
       function log(msg) {
         var element = document.getElementById('output');

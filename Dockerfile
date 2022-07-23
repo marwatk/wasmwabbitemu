@@ -1,7 +1,6 @@
 FROM ubuntu:20.04 AS build
 
 ENV EMSDK_VERSION=3.1.15
-ENV BUSYBOX_STATIC=https://busybox.net/downloads/binaries/1.35.0-i686-linux-musl/busybox
 
 RUN set -ex; \
     apt-get update; \
@@ -16,8 +15,6 @@ RUN set -ex; \
         python \
         ; \
     mkdir -p /opt/src; \
-    mkdir -p /opt/root/bin/; \
-    curl -o /opt/root/bin/httpd "${BUSYBOX_STATIC}"; \
     : ;
 
 RUN set -ex; \
@@ -37,40 +34,46 @@ ENV EMSDK_NODE=/opt/emsdk/node/14.18.2_64bit/bin/node
 WORKDIR /opt/src
 COPY . /opt/src/
 
+# TODO: This attempts to download a precompiled sdl2 which should be 
+# embedded with a fixed version instead.
 RUN set -ex; \
     env; \
+    # Display what we're going to do, useful for debuggin
     emmake make -n; \
     emmake make -j8; \
-    chmod a-w /opt/src/bin/wxWabbitemu.*; \
     : ;
 
+COPY docker/ /opt/root/
+
+# Build the eventual webserver
 RUN set -ex; \
-    mkdir /opt/root/etc/; \
-    echo "" > /opt/root/etc/httpd.conf; \
-    echo "I:index.html" >> /opt/root/etc/httpd.conf; \
-    echo ".wasm:application/wasm" >> /opt/root/etc/httpd.conf; \
-    echo "H:/public" >> /opt/root/etc/httpd.conf; \
     mkdir -p /opt/root/public/roms; \
     cp \
       /opt/src/bin/wxWabbitemu.js \
       /opt/src/bin/wxWabbitemu.wasm \
-      /opt/src/index.html \
       /opt/root/public/; \
     chmod -R 444 /opt/root; \
     chmod 555 \
-      /opt/root/bin \
-      /opt/root/bin/httpd \
       /opt/root/public \
       /opt/root/public/roms \
       ; \
+    chmod a+x /opt/root/entrypoint; \
     : ;
 
-FROM scratch
+FROM busybox:1.34.1
 
 COPY --from=build /opt/root /
 
 VOLUME /public/roms
 EXPOSE 8080
 
-ENTRYPOINT ["/bin/httpd"]
-CMD ["-p", "8080", "-f"]
+RUN set -e; \
+    touch /public/romlist.txt; \
+    chmod 666 /public/romlist.txt; \
+    : ;
+
+# We don't set USER here to allow for rootless running (e.g. podman)
+# without having to create subuids, but you can run as non-root using
+# -u on docker run.
+
+ENTRYPOINT ["/entrypoint"]
