@@ -432,7 +432,7 @@ canvas {
         </span>
       </span>
       <p>ROM Selection:</p>
-      <select id="rom">
+      <select id="rom" onchange="javascript:romSelected()">
         <option value="">Choose ROM</option>
       </select>
       <p>Emulator Log:</p>
@@ -517,6 +517,8 @@ canvas {
 
 
     <script type='text/javascript'>
+      const fsPath = "/idbfs";
+      const lastRomFile = "lastrom.txt";
       var romSet = false;
       var romPathPointer = 0;
       var calcInputs = [];
@@ -526,9 +528,22 @@ canvas {
       var progressElement = document.getElementById('progress');
       var spinnerElement = document.getElementById('spinner');
       
+      function basename(path) {
+        var ar = path.split(/[\\/]/);
+        var r = ar.pop();
+        if ( r == "" ) {
+          r = ar.pop();
+        }
+        return r;
+      }
+
       function calcLoaded() {
         log("Calc loaded!");
         document.getElementById("menu").style.display = "none";
+        rom = UTF8ToString(romPathPointer, 2048);
+        log("Setting last rom to [" + rom + "]");
+        FS.writeFile(fsPath + "/" + lastRomFile, rom);
+        runSync();
       }
 
       function fetchCalcInput() {
@@ -536,6 +551,31 @@ canvas {
             return 0;
         }
         return calcInputs.shift();
+      }
+
+      function romSelected() {
+        var rom = document.getElementById("rom").value;
+        if( rom == "" ) {
+          return;
+        }
+        if ( rom.startsWith(fsPath) ) {
+          setRomPath(rom);
+          return;
+        }
+        fetchAndLoadRom(rom);
+      }
+
+      async function fetchAndLoadRom(url) {
+        var response = await fetch(url);
+        if (!response.ok) {
+          log("Error loading rom: " + response.statusText);
+          return;
+        }
+        var romContent = await response.arrayBuffer();
+        var path = fsPath + "/" + basename(url);
+        log(`Saving rom to [${path}]`);
+        FS.writeFile(path, new DataView(romContent));
+        runSync();
       }
 
       function setRomPathPointer(pointer) {
@@ -578,29 +618,36 @@ canvas {
         keypadEvent(event, true);
       }
 
-      function initRom() {
-        var files = Object.keys(FS.lookupPath("/idbfs").node.contents);
+      function fsLoaded() {
+        var files = Object.keys(FS.lookupPath(fsPath).node.contents);
         var file;
         var lastRom = "";
         var i;
+        var path;
         for( i = 0; i < files.length; i++ ) {
           file = files[i];
-          if (file == "lastrom.txt") {
-            lastRom = FS.readFile("/idbfs/" + file, { encoding: "utf8" });
+          path = fsPath + "/" + file;
+          if (file == lastRomFile) {
+            lastRom = FS.readFile(path, { encoding: "utf8" });
           }
           else {
-            browserRoms.push(file);
+            browserRoms.push(path);
           }
         }
         for( i = 0; i < browserRoms.length; i++ ) {
           if( lastRom == browserRoms[i] ) {
-            setRomPath("/idbfs/" + lastRom);
+            setRomPath(fsPath + "/" + lastRom);
           }
         }
         updateRomList();
       }
 
       function setRomPath(romPath) {
+        if (romPathPointer == 0) {
+          log("Attempted to set romPath with zero romPathPointer!");
+          return;
+        }
+        log(`Setting rom path [${romPath}]`);
         stringToUTF8(romPath, romPathPointer, 2048);
       }
 
@@ -608,15 +655,15 @@ canvas {
         log("main() has started");
         log("Creating IDBFS filesystem");
         Module.syncing = true;
-        FS.mkdir('/idbfs');
-        FS.mount(IDBFS, {}, '/idbfs');
+        FS.mkdir(fsPath);
+        FS.mount(IDBFS, {}, fsPath);
         FS.syncfs(true, function (err) {
           Module.syncing = false;
           if ( err ) {
             log("Error loading idbfs: " + err);
           } else {
             log("IDBFS filesystem loaded");
-            initRom();
+            fsLoaded();
           }
         });
       }
@@ -628,7 +675,7 @@ canvas {
         return true;
       }
       
-      function sync() {
+      function runSync() {
         Module.syncing = true;
         FS.syncfs(function (err) {
           Module.syncing = false;
@@ -641,7 +688,7 @@ canvas {
       }
 
       async function fetchServerRoms() {
-        var response = await fetch("/romlist.txt");
+        var response = await fetch("romlist.txt");
         var i;
         var roms;
         var rom;

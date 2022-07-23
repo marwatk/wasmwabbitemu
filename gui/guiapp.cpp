@@ -179,7 +179,8 @@ void WabbitemuApp::tick() {
 		//std::cout << "WXK_UP: " << WXK_UP << "\n";
 		//std::cout << "WXK_DOWN: " << WXK_DOWN << "\n";
 		if( e.type == SDL_KEYDOWN ) {
-			keyDown(e.key.keysym.sym);
+			printf("SDL_KeyDown: %d: [%c]\n", e.key.keysym.sym, e.key.keysym.sym);
+      keyDown(e.key.keysym.sym);
 		}
 		if( e.type == SDL_KEYUP ) {
 			keyUp(e.key.keysym.sym);
@@ -285,14 +286,14 @@ EM_BOOL loop(double time, void* userData) {
   }
 
   if (!initDone && romPath[0] != 0) {
-		printf("Initializing with rom path %s\n", romPath);
-		if (!app.init()) {
-			printf("Init failed\n");
-			romPath[0] = 0;
-		}
-		printf("Init succeeded\n");
-    EM_ASM(calcLoaded());
-		initDone = true;
+    printf("Initializing with rom path %s\n", romPath);
+    if (!app.init()) {
+      printf("Init failed\n");
+      romPath[0] = 0;
+    }
+    printf("Init succeeded\n");
+      EM_ASM(calcLoaded());
+      initDone = true;
 	}
 	if (initDone) {
 		app.tick();

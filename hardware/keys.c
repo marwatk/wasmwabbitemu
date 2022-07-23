@@ -687,6 +687,7 @@ keyprog_t keygrps[256] = {
 	{ SDLK_KP_8 , 3 , 3 },
 	{ SDLK_KP_9 , 2 , 3 },
 	{ SDLK_KP_DECIMAL , 3 , 0 },
+	{ '`', 5, 0 },
 	//{ VK_OEM_2, 2, 0 },
 	{ SDLK_F12, KEYGROUP_ON, KEYBIT_ON},
 #endif
