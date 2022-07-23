@@ -1,16 +1,23 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 AS build
 
 ENV EMSDK_VERSION=3.1.15
+ENV BUSYBOX_STATIC=https://busybox.net/downloads/binaries/1.35.0-i686-linux-musl/busybox
 
 RUN set -ex; \
     apt-get update; \
     DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC \
       apt-get install -y \
+        build-essential \
         cmake \
+        curl \
         g++ \
         git \
+        libsdl2-dev \
         python \
         ; \
+    mkdir -p /opt/src; \
+    mkdir -p /opt/root/bin/; \
+    curl -o /opt/root/bin/httpd "${BUSYBOX_STATIC}"; \
     : ;
 
 RUN set -ex; \
@@ -27,38 +34,43 @@ ENV EMSDK=/opt/emsdk
 ENV EM_CONFIG=/opt/emsdk/.emscripten
 ENV EMSDK_NODE=/opt/emsdk/node/14.18.2_64bit/bin/node
 
-RUN set -ex; \
-    mkdir -p /opt/src; \
-    : ;
-
 WORKDIR /opt/src
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libsdl2-dev
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y x11-xserver-utils
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y busybox
-
-RUN apt-get install -y tightvncserver
-
-ENV USER=root
-
-RUN set -ex; \
-    mkdir -p /root/.vnc; \
-    echo -n password | vncpasswd -f > /root/.vnc/passwd; \
-    chmod 600 /root/.vnc/passwd; \
-    : ;
-
 COPY . /opt/src/
+
 RUN set -ex; \
     env; \
-    cp TI85.ROM build/z.rom; \
+    emmake make -n; \
     emmake make -j8; \
-    cp -v index.html bin/; \
+    chmod a-w /opt/src/bin/wxWabbitemu.*; \
     : ;
 
-ENV DISPLAY=:1
-ENV HOME=/root
+RUN set -ex; \
+    mkdir /opt/root/etc/; \
+    echo "" > /opt/root/etc/httpd.conf; \
+    echo "I:index.html" >> /opt/root/etc/httpd.conf; \
+    echo ".wasm:application/wasm" >> /opt/root/etc/httpd.conf; \
+    echo "H:/public" >> /opt/root/etc/httpd.conf; \
+    mkdir -p /opt/root/public/roms; \
+    cp \
+      /opt/src/bin/wxWabbitemu.js \
+      /opt/src/bin/wxWabbitemu.wasm \
+      /opt/src/index.html \
+      /opt/root/public/; \
+    chmod -R 444 /opt/root; \
+    chmod 555 \
+      /opt/root/bin \
+      /opt/root/bin/httpd \
+      /opt/root/public \
+      /opt/root/public/roms \
+      ; \
+    : ;
 
-CMD ["busybox", "httpd", "-p", "8080", "-h", "/opt/src/bin", "-f"]
-#CMD ["bash", "-c", "tightvncserver; DISPLAY=:1 bin/wxWabbitemu z.rom"]
+FROM scratch
+
+COPY --from=build /opt/root /
+
+VOLUME /public/roms
+EXPOSE 8080
+
+ENTRYPOINT ["/bin/httpd"]
+CMD ["-p", "8080", "-f"]

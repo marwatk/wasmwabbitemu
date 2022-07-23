@@ -62,44 +62,6 @@
         to {transform: rotate(360deg);}
       }
 
-      #status {
-        display: inline-block;
-        vertical-align: top;
-        margin-top: 30px;
-        margin-left: 20px;
-        font-weight: bold;
-        color: rgb(120, 120, 120);
-      }
-
-      #progress {
-        height: 20px;
-        width: 300px;
-      }
-
-      #controls {
-        display: inline-block;
-        float: right;
-        vertical-align: top;
-        margin-top: 30px;
-        margin-right: 20px;
-      }
-
-      #output {
-        width: 100%;
-        height: 200px;
-        margin: 0 auto;
-        margin-top: 10px;
-        border-left: 0px;
-        border-right: 0px;
-        padding-left: 0px;
-        padding-right: 0px;
-        display: block;
-        background-color: black;
-        color: white;
-        font-family: 'Lucida Console', Monaco, monospace;
-        outline: none;
-      }
-
 
 
 
@@ -116,6 +78,55 @@ body {
   font-size: 3vmin;
 }
 
+#menu {
+  display: block;
+  position: fixed;
+  padding: 1em;
+  background-color: gray;
+  color: black;
+  top: 5%;
+  left: 5%;
+  right: 5%;
+  bottom: 20%;
+}
+
+
+#status {
+  display: block;
+  font-weight: bold;
+  color: black;
+}
+
+#menu p {
+  margin-top: 2em;
+}
+
+#progress {
+  height: 20px;
+  width: 300px;
+}
+
+#controls {
+  margin-top: 30px;
+  margin-right: 20px;
+}
+
+#output {
+  width: 100%;
+  height: 200px;
+  margin: 0 auto;
+  margin-top: 0px;
+  border-left: 0px;
+  border-right: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  display: block;
+  background-color: black;
+  color: white;
+  font-family: 'Lucida Console', Monaco, monospace;
+  outline: none;
+}
+
 #calc {
   background-color: black;
   max-width: 100vw;
@@ -128,9 +139,6 @@ body {
 
 .calc button {
   width: 100%;
-}
-
-button.function {
 }
 
 .arrow-buttons {
@@ -406,34 +414,27 @@ canvas {
   height: 100%;
 }
 
-#controls {
-  display: none;
-}
-#status {
-  display: none;
-}
-#output {
-  display: none;
-}
-
     </style>
   </head>
   <body>
-    <div class="spinner" id='spinner'></div>
-    <div class="emscripten" id="status">Downloading...</div>
 
-<span id='controls'>
-  <span><input type="checkbox" id="resize">Resize canvas</span>
-  <span><input type="checkbox" id="pointerLock" checked>Lock/hide mouse pointer &nbsp;&nbsp;&nbsp;</span>
-  <span><input type="button" value="Fullscreen" onclick="Module.requestFullscreen(document.getElementById('pointerLock').checked, 
-                                                                            document.getElementById('resize').checked)">
-  </span>
-</span>
 
-    <div class="emscripten">
-      <progress value="0" max="100" id="progress" hidden=1></progress>
+  
+    <div id="menu" class="menu">
+      <div class="spinner" id='spinner'></div>
+      <div class="emscripten" id="status">Downloading...</div>
+      <div class="emscripten">
+        <progress value="0" max="100" id="progress" hidden=1></progress>
+      </div>
+      <span id='controls'>
+        <span><input type="button" value="Fullscreen" onclick="Module.requestFullscreen(document.getElementById('pointerLock').checked, 
+                                                                                  document.getElementById('resize').checked)">
+        </span>
+      </span>
+      <p>Emulator Log:</p>
+      <textarea id="output" rows="8" readonly></textarea>
     </div>
-    
+
     <div id='calc' class='calc ti85'>
       <div class="title-bar">
         <div class="branding">
@@ -510,9 +511,10 @@ canvas {
       <button id='k10' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
     </div>
 
-    <textarea id="output" rows="8"></textarea>
 
     <script type='text/javascript'>
+      var romSet = false;
+      var romPathPointer = 0;
       var calcInputs = [];
       var statusElement = document.getElementById('status');
       var progressElement = document.getElementById('progress');
@@ -523,6 +525,11 @@ canvas {
             return 0;
         }
         return calcInputs.shift();
+      }
+
+      function setRomPathPointer(pointer) {
+        console.log(`Rom path pointer: ${pointer}`);
+        romPathPointer = pointer;
       }
 
       function inputToBit(input) {
@@ -560,6 +567,41 @@ canvas {
         keypadEvent(event, true);
       }
 
+      function mainJs() {
+        log("main() has started");
+        console.log("Creating IDBFS filesystem");
+        Module.syncing = true;
+        FS.mkdir('/roms');
+        FS.mount(IDBFS, {}, '/roms');
+        FS.syncfs(true, function (err) {
+          Module.syncing = false;
+          if ( err ) {
+            console.log("Error syncing idbfs: " + err);
+          } else {
+            console.log("IDBFS filesystem synced");
+          }
+        });
+      }
+
+      function loopJs() {
+        if (Module.syncing) {
+          return false;
+        }
+        return true;
+      }
+      
+      function sync() {
+        Module.syncing = true;
+        FS.syncfs(function (err) {
+          Module.syncing = false;
+          if ( err ) {
+            console.log("Error syncing idbfs: " + err);
+          } else {
+            console.log("IDBFS filesystem synced");
+          }
+        });
+      }
+
       function addKeypadHandlers() {
         var buttons = document.getElementsByTagName("button");
         console.log("Num buttons: " + buttons.length);
@@ -576,6 +618,15 @@ canvas {
 
       addKeypadHandlers();
 
+      function log(msg) {
+        var element = document.getElementById('output');
+        console.log(msg);
+        if (element) {
+          element.value += msg + "\n";
+          element.scrollTop = element.scrollHeight; // focus on bottom
+        }
+      }
+
       var Module = {
         preRun: [],
         postRun: [],
@@ -584,16 +635,7 @@ canvas {
           if (element) element.value = ''; // clear browser cache
           return function(text) {
             if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-            // These replacements are necessary if you render to raw HTML
-            //text = text.replace(/&/g, "&amp;");
-            //text = text.replace(/</g, "&lt;");
-            //text = text.replace(/>/g, "&gt;");
-            //text = text.replace('\n', '<br>', 'g');
-            console.log(text);
-            if (element) {
-              element.value += text + "\n";
-              element.scrollTop = element.scrollHeight; // focus on bottom
-            }
+            log(text);
           };
         })(),
         canvas: (function() {
@@ -636,7 +678,8 @@ canvas {
       };
       Module.setStatus('Downloading...');
       window.onerror = function(event) {
-        // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
+        log("Received error: " + event);
+        log("Javascript console will have further information");
         Module.setStatus('Exception thrown, see JavaScript console');
         spinnerElement.style.display = 'none';
         Module.setStatus = function(text) {

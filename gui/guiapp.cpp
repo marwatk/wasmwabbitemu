@@ -15,17 +15,19 @@ LPCALC theCalc;
 SDL_Renderer *renderer = NULL;      // Pointer for the renderer
 SDL_Window *window = NULL;      // Pointer for the window
 
+#define LCD_HIGH	255
+
+#define MAX_PATH_LEN 2048
+
 #define MAX_KEYPRESSES 10
 int numKeypresses = 0;
 int inkeyPressIdx = 0;
 int outkeyPressIdx = 0;
 js_key keyQueue[MAX_KEYPRESSES];
 
-#define ROM_FILE "z.rom"
-
-int charToInt(char c) {
-	return c - 48;
-}
+// This probably isn't unicode friendly?
+char romPath[MAX_PATH_LEN];
+bool initDone = false;
 
 bool fetchCalcInput(js_key *key) {
 	uint input = EM_ASM_INT(return fetchCalcInput());
@@ -86,7 +88,7 @@ bool WabbitemuApp::init() {
 		calc_slot_free(lpCalc);
 		BOOL loadedRom = FALSE;
 		
-		if (rom_load(lpCalc, ROM_FILE)) {
+		if (rom_load(lpCalc, romPath)) {
 			puts("Second load worked\n");
 			loadedRom = TRUE;
 		}
@@ -97,7 +99,6 @@ bool WabbitemuApp::init() {
 	}
 	lpCalc->running = TRUE;
 
-#define LCD_HIGH	255
 	for (int i = 0; i <= MAX_SHADES; i++) {
 		redColors[i] = (0x9E*(256-(LCD_HIGH/MAX_SHADES)*i))/255;
 		greenColors[i] = (0xAB*(256-(LCD_HIGH/MAX_SHADES)*i))/255;
@@ -278,9 +279,23 @@ void WabbitemuApp::FinalizeButtons() {
 WabbitemuApp app;
 
 EM_BOOL loop(double time, void* userData) {
-  app.tick();
-  //puts("Looping\n");
-  // Return true to keep the loop running.
+  
+  if (EM_ASM_INT( return loopJs(); ) == 0) {
+    return EM_TRUE;
+  }
+
+  if (!initDone && romPath[0] != 0) {
+		printf("Initializing with rom path %s\n", romPath);
+		if (!app.init()) {
+			printf("Init failed\n");
+			romPath[0] = 0;
+		}
+		printf("Init succeeded\n");
+		initDone = true;
+	}
+	if (initDone) {
+		app.tick();
+	}
   return EM_TRUE;
 }
 
@@ -288,13 +303,23 @@ void voidLoop() {
 	app.tick();
 }
 
-void test() {
-  FILE *file = fopen("test.txt", "rb");
+void testWrite() {
+  FILE *file = fopen("/roms/test.txt", "wb");
   if (!file) {
-    printf("cannot open file\n");
+    printf("cannot open file for writing\n");
     return;
   }
-  while (!feof(file)) {
+  fprintf(file, "Here's some file stuff\n");
+	fclose(file);
+}
+
+void testRead() {
+  FILE *file = fopen("/roms/test.txt", "rb");
+  if (!file) {
+    printf("cannot open file for reading\n");
+    return;
+  }
+	while (!feof(file)) {
     char c = fgetc(file);
     if (c != EOF) {
       putchar(c);
@@ -303,22 +328,20 @@ void test() {
   fclose (file);
 }
 
+EM_JS(void, sync, (), {
+  sync();
+});
+
 int main(int argc, char * argv[]){
-	printf("Pre app\n");
-	if (!app.init()) {
-		puts("Init failed\n");
-		return 1;
-	}
-	printf("Post init\n");
+	romPath[0] = 0;
+
+	EM_ASM(
+		setRomPathPointer($0);
+ 		mainJs();
+	, &romPath);
+
 	//emscripten_set_main_loop(voidLoop, 0, false);
 	emscripten_request_animation_frame_loop(loop, 0);
 	//test();
-	
-	
-	//while(true){
-    //    SDL_Delay(10);  // setting some Delay
-	//	app.tick();
-	//}
 }
-
 
