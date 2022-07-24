@@ -15,17 +15,7 @@ LPCALC theCalc;
 SDL_Renderer *renderer = NULL;      // Pointer for the renderer
 SDL_Window *window = NULL;      // Pointer for the window
 
-#define MAX_KEYPRESSES 10
-int numKeypresses = 0;
-int inkeyPressIdx = 0;
-int outkeyPressIdx = 0;
-js_key keyQueue[MAX_KEYPRESSES];
-
 #define ROM_FILE "z.rom"
-
-int charToInt(char c) {
-	return c - 48;
-}
 
 bool mapKey(int keycode, js_key *key) {
 	uint input = EM_ASM_INT(return mapKey($0), keycode);
@@ -105,8 +95,9 @@ unsigned WabbitemuApp::GetTickCount()
 }
 
 
-
+int tickNum = 0;
 void WabbitemuApp::tick() {
+	tickNum++;
 	static int difference;
 	static unsigned prevTimer;
 	unsigned dwTimer = GetTickCount();
@@ -140,22 +131,13 @@ void WabbitemuApp::tick() {
 
   js_key jsKey;
 	SDL_Event e;
+	bool didKey = false;
 	while (SDL_PollEvent(&e)) {  // poll until all events are handled!
-    //std::cout << "Got SDL event\n";
-		//std::cout << "WXK_UP: " << WXK_UP << "\n";
-		//std::cout << "WXK_DOWN: " << WXK_DOWN << "\n";
     if( e.type == SDL_KEYDOWN || e.type == SDL_KEYUP ) {
-      printf("Key event: %d: [%c]\n", e.key.keysym.sym, e.key.keysym.sym);
+      printf("Tick %d: Key event: %d: [%c]\n", tickNum, e.key.keysym.sym, e.key.keysym.sym);
       if( !mapKey(e.key.keysym.sym, &jsKey) ) {
         continue;
       }
-      /*
-      keyprog_t *key = keypad_map_key(&theCalc->cpu, e.key.keysym.sym);
-      if ( key == NULL ) {
-        continue;
-      }
-      */
-
       if( e.type == SDL_KEYDOWN ) {
         printf("Keydown: %d: [%c], %d,%d\n",
           e.key.keysym.sym, e.key.keysym.sym,
@@ -163,12 +145,28 @@ void WabbitemuApp::tick() {
         keyDown(jsKey.group, jsKey.bit);
       }
       if( e.type == SDL_KEYUP ) {
+        printf("Keyup: %d: [%c], %d,%d\n",
+          e.key.keysym.sym, e.key.keysym.sym,
+          jsKey.group, jsKey.bit);
         keyUp(jsKey.group, jsKey.bit);
       }
-
+			// Only allow one key event per cpu tick
+			didKey = true;
+			break;
     }
-		
   }
+	if ( !didKey && EM_ASM_INT(return calcInputs.length) > 0 ) {
+		int input = EM_ASM_INT(return calcInputs.shift());
+		int bit = input & 0xFF;
+		int group = (input & 0xFF00) >> 8;
+		bool up = (input & 0x10000) != 0;
+		if ( up ) {
+        keyUp(group, bit);
+		}
+		else {
+			keyDown(group, bit);
+		}
+	}
 }
 
 void WabbitemuApp::render() {
