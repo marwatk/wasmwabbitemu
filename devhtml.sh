@@ -11,4 +11,4 @@ if ! [[ -v SKIP_BUILD ]]; then
 fi
 
 docker kill "${CONTAINER_NAME}" || true
-docker run --rm -v "$(pwd -P)/index.html:/opt/src/bin/index.html" -p "${PORT}:8080" --name "${CONTAINER_NAME}" "${IMAGE_NAME}"
+docker run -d --rm -v "$(pwd -P)/index.html:/opt/src/bin/index.html" -p "${PORT}:8080" --name "${CONTAINER_NAME}" "${IMAGE_NAME}"

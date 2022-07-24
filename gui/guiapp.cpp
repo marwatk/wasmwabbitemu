@@ -178,34 +178,13 @@ void WabbitemuApp::tick() {
 		//std::cout << "WXK_UP: " << WXK_UP << "\n";
 		//std::cout << "WXK_DOWN: " << WXK_DOWN << "\n";
 		if( e.type == SDL_KEYDOWN ) {
-			keyDown(e.key.keysym.sym);
+			printf("Keydown: %d: [%c]\n", e.key.keysym.sym, e.key.keysym.sym);
+      keyDown(e.key.keysym.sym);
 		}
 		if( e.type == SDL_KEYUP ) {
 			keyUp(e.key.keysym.sym);
 		}
   }
-
-	js_key jsKey;
-	if (fetchCalcInput(&jsKey)) {
-		keypad_t *kp = theCalc->cpu.pio.keypad;
-		int group = jsKey.group;
-		int bit = jsKey.bit;
-		if(jsKey.up) {
-			kp->keys[group][bit] &= ~(KEY_MOUSEPRESS | KEY_STATEDOWN);
-			if (group == 0x05 && bit == 0x00) {
-				theCalc->cpu.pio.keypad->on_pressed &= ~KEY_MOUSEPRESS;
-			}
-		} else {
-			if (group == 0x05 && bit == 0x00) {
-				theCalc->cpu.pio.keypad->on_pressed |= KEY_MOUSEPRESS;
-			} else {
-				kp->keys[group][bit] |= KEY_MOUSEPRESS;
-				if ((kp->keys[group][bit] & KEY_STATEDOWN) == 0) {
-					kp->keys[group][bit] |= KEY_STATEDOWN;
-				}
-			}
-		}
-	}
 }
 
 void WabbitemuApp::render() {

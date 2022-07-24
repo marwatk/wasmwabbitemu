@@ -34,6 +34,8 @@ class WabbitemuApp
 public:
  	void keyDown(int keycode);
 	void keyUp(int keycode);
+ 	void keyDown(int group, int bit);
+	void keyUp(int group, int bit);
 	void FinalizeButtons();
 	
 	bool init();

@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>wasmWabbitemu1</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <style>
       body {
         font-family: arial;
@@ -145,7 +146,7 @@ button.function {
 }
 
 /*
-<button id="k00" class="button"><div class='labels'></div><div class='key'></div></button>
+<button id="k00" class="keypad"><div class='labels'></div><div class='key'></div></button>
 */
 .arrow-buttons .arrow-down {
   grid-column: 2;
@@ -446,68 +447,68 @@ canvas {
       <div class="lcd">
         <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
       </div>
-      <button id='k64' class='button non-arrow function'><div class='labels'></div><div class='key'></div></button>
-      <button id='k63' class='button non-arrow function'><div class='labels'></div><div class='key'></div></button>
-      <button id='k62' class='button non-arrow function'><div class='labels'></div><div class='key'></div></button>
-      <button id='k61' class='button non-arrow function'><div class='labels'></div><div class='key'></div></button>
-      <button id='k60' class='button non-arrow function'><div class='labels'></div><div class='key'></div></button>
+      <button id='k64' class='keypad non-arrow function'><div class='labels'></div><div class='key'></div></button>
+      <button id='k63' class='keypad non-arrow function'><div class='labels'></div><div class='key'></div></button>
+      <button id='k62' class='keypad non-arrow function'><div class='labels'></div><div class='key'></div></button>
+      <button id='k61' class='keypad non-arrow function'><div class='labels'></div><div class='key'></div></button>
+      <button id='k60' class='keypad non-arrow function'><div class='labels'></div><div class='key'></div></button>
 
-      <button id='k65' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k66' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k67' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k65' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k66' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k67' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
 
       <div class="arrow-buttons">
-        <button id='k03' class="button arrow-button arrow-up">▲</button>
-        <button id='k01' class="button arrow-button arrow-left">◀</button>
-        <button id='k02' class="button arrow-button arrow-right">▶</button>
-        <button id='k00' class="button arrow-button arrow-down">▼</button>
+        <button id='k03' class="keypad arrow-button arrow-up">▲</button>
+        <button id='k01' class="keypad arrow-button arrow-left">◀</button>
+        <button id='k02' class="keypad arrow-button arrow-right">▶</button>
+        <button id='k00' class="keypad arrow-button arrow-down">▼</button>
       </div>
 
-      <button id='k57' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k47' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k37' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k57' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k47' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k37' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
 
-      <button id='k56' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k46' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k36' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k26' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k16' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k56' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k46' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k36' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k26' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k16' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
 
-      <button id='k55' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k45' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k35' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k25' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k15' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k55' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k45' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k35' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k25' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k15' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
 
-      <button id='k54' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k44' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k34' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k24' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k14' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k54' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k44' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k34' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k24' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k14' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
 
-      <button id='k53' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k43' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k33' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k23' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k13' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k53' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k43' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k33' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k23' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k13' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
 
-      <button id='k52' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k42' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k32' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k22' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k12' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k52' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k42' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k32' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k22' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k12' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
 
-      <button id='k51' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k41' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k31' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k21' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k11' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k51' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k41' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k31' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k21' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k11' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
 
-      <button id='k50' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k40' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k30' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k20' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
-      <button id='k10' class='button non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k50' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k40' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k30' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k20' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k10' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
     </div>
 
     <textarea id="output" rows="8"></textarea>
@@ -518,11 +519,85 @@ canvas {
       var progressElement = document.getElementById('progress');
       var spinnerElement = document.getElementById('spinner');
       
-      function fetchCalcInput() {
-        if(calcInputs.length == 0) {
-            return 0;
+      // Determined experimentally on a chromebook
+      // TODO: Use the javascript consts, though they seem to vary by OS?
+      const LShift = 1073742049;
+      const RShift = 1073742053;
+      const UpArrow = 1073741906;
+      const DownArrow = 1073741905;
+      const RightArrow = 1073741903;
+      const LeftArrow = 1073741904;
+      const Escape = 27;
+      const LCtrl = 1073742048;
+      const RCtrl = 1073742052;
+      const LAlt = 1073742050;
+      const RAlt = 1073742054;
+      const Backspace = 8;
+      const Enter = 13;
+      const Delete = 46;
+
+      var keyMap = {};
+      var reverseKeyMap = {};
+      const keys = [
+// [[Javascript keyCodes], Group, Bit]
+[['z'],6,4],            [['v'],6,3],    [['b'],6,2],    [['j'],6,1], [['k'],6,0], // Function keys
+                                                                       [[UpArrow],0,3],  
+[[LShift, RShift],6,5], [[Escape],6,6], [[LCtrl,RCtrl],6,7],   [[LeftArrow],0,1], [[RightArrow],0,2],
+[[LAlt,RAlt],5,7],      [['x'],4,7],    [[Delete],3,7],                [[DownArrow],0,0],  
+[['g'],5,6],            [['s'],4,6],    [['p'],3,6],    [['c'],2,6], [[Backspace],1,6],  
+[['l'],5,5],            [['i'],4,5],    [['o'],3,5],    [['t'],2,5], [['w'],1,5],  
+[['d'],5,4],            [['e'],4,4],    [['['],3,4],    [[']'],2,4], [['/'],1,4],  
+[['q'],5,3],            [['7'],4,3],    [['8'],3,3],    [['9'],2,3], [['*'],1,3],  
+[[','],5,2],            [['4'],4,2],    [['5'],3,2],    [['6'],2,2], [['-'],1,2],  
+[[''],5,1],             [['1'],4,1],    [['2'],3,1],    [['3'],2,1], [['='],1,1],
+[['`'],5,0],            [['0'],4,0],    [['.'],3,0],    [['n'],2,0], [[Enter],1,0]];
+
+      function addKeypadHandlers() {
+        $("button.keypad")
+          .on("mousedown", { up: false }, keypadEvent)
+          .on("mouseup", { up: true }, keypadEvent);
+      }
+
+      function mapKey(keyCode) {
+        return keyMap[keyCode];
+      }
+
+      function generateKeymap() {
+        var i;
+        var j;
+        var keyCode;
+        var keyInt;
+        var keyCharOrCode;
+        for ( i = 0; i < keys.length; i++ ) {
+          keys[i] = keys[i];
+          for ( j = 0; j < keys[i][0].length; j++ ) {
+            keyCharOrCode = keys[i][0][j];
+            keyCode = typeof keyCharOrCode == 'string' ? keyCharOrCode.charCodeAt(0) : keyCharOrCode;
+            if (keyMap[keyCode]) {
+              console.log(`Warning: keyCode ${keyCode} already assigned`);
+            }
+            keyInt = serializeKey(keys[i][1], keys[i][2]);
+            keyMap[keyCode] = keyInt;
+            reverseKeyMap[keyInt] = keyCode;
+          }
         }
-        return calcInputs.shift();
+      }
+
+      function keypadEvent(event) {
+        var id = event.currentTarget.id;
+        var keyInt = serializeKey(parseInt(id[1]) & 0xFF, parseInt(id[2]) & 0xFF);
+        var keycode = reverseKeyMap[keyInt];
+        if (keycode == 0) {
+          log(`keypad id ${id} does not have mapping!`);
+          return;
+        }
+        $("#canvas").trigger( $.Event( 
+          event.data.up ? "keyup" : "keydown", 
+          { keyCode: keycode } ) );
+      }
+
+      function serializeKey(group, bit) {
+        return 0x10000 | (group << 8) | bit;
       }
 
       function inputToBit(input) {
@@ -531,49 +606,31 @@ canvas {
       function inputToGroup(input) {
         return (input & 0xFF00) >> 16;
       }
+      /*
+function simulateKeyEvent(eventType, keyCode, charCode) {
+  var e = document.createEventObject ? document.createEventObject() : document.createEvent("Events");
+  if (e.initEvent) e.initEvent(eventType, true, true);
 
-      function keypadEvent(event, up) {
-        var id = event.currentTarget.id;
-        if (id.length != 3) {
-            console.log(`id [${id}] is not proper length`);
-            return;
-        }
-        if (id[0] != "k") {
-            console.log(`id ${id} doesn't start with k`);
-            return;
-        }
-        var group = parseInt(id[1]) & 0xFF;
-        var bit = parseInt(id[2]) & 0xFF;
-        input = 0x20000;
-        if (up) {
-            input |= 0x10000;
-        }
-        input |= (group << 8);
-        input |= bit;
-        calcInputs.push(input);
-      }
+  e.keyCode = keyCode;
+  e.which = keyCode;
+  e.charCode = charCode;
 
-      function keypadDown(event) {
-        keypadEvent(event, false);
+  // Dispatch directly to Emscripten's html5.h API (use this if page uses emscripten/html5.h event handling):
+  if (typeof JSEvents !== 'undefined' && JSEvents.eventHandlers && JSEvents.eventHandlers.length > 0) {
+    for(var i = 0; i < JSEvents.eventHandlers.length; ++i) {
+      if ((JSEvents.eventHandlers[i].target == Module['canvas'] || JSEvents.eventHandlers[i].target == window)
+       && JSEvents.eventHandlers[i].eventTypeString == eventType) {
+         JSEvents.eventHandlers[i].handlerFunc(e);
       }
-      function keypadUp(event) {
-        keypadEvent(event, true);
-      }
+    }
+  } else {
+    // Dispatch to browser for real (use this if page uses SDL or something else for event handling):
+    Module['canvas'].dispatchEvent ? Module['canvas'].dispatchEvent(e) : Module['canvas'].fireEvent("on" + eventType, e);
+  }
+}
+*/
 
-      function addKeypadHandlers() {
-        var buttons = document.getElementsByTagName("button");
-        console.log("Num buttons: " + buttons.length);
-        for (let i = 0; i < buttons.length; i++) {
-          if ( buttons[i].id[0] == "k" ) {
-            buttons[i].addEventListener("mousedown", keypadDown);
-            buttons[i].addEventListener("mouseup", keypadUp);
-          }
-          else {
-            console.log("Element id [" + buttons[i].id + "] doesn't start with k");
-          }
-        }
-      }
-
+      generateKeymap();
       addKeypadHandlers();
 
       var Module = {
