@@ -756,6 +756,13 @@ void keypad(CPU_t *cpu, device_t *dev) {
 
 void keypad_press(CPU_t *cpu, int group, int bit)
 {
+	keypad_t *keypad = cpu->pio.keypad;
+	int orig = group;
+	if (group == KEYGROUP_ON && bit == KEYBIT_ON) {
+		orig = keypad->on_pressed;
+	} else {
+		orig = keypad->keys[group][bit];
+	}
 	if (group == KEYGROUP_ON && bit == KEYBIT_ON)
 	{
 		cpu->pio.keypad->on_pressed |= KEY_KEYBOARDPRESS;
@@ -766,32 +773,14 @@ void keypad_press(CPU_t *cpu, int group, int bit)
 	}
 }
 
-keyprog_t *keypad_key_press(CPU_t *cpu, unsigned int vk, BOOL *changed)
+keyprog_t *keypad_key_press(CPU_t *cpu, unsigned int vk)
 {
 	int i;
-	keypad_t *keypad = cpu->pio.keypad;
-
-	if (keypad == NULL) {
-		return NULL;
-	}
 	for(i = 0; i < NumElm(keygrps); i++)
 	{
 		if (keygrps[i].vk == vk)
 		{
-			int orig, group = keygrps[i].group, bit = keygrps[i].bit;
-			if (group == KEYGROUP_ON && bit == KEYBIT_ON) {
-				orig = keypad->on_pressed;
-			} else {
-				orig = keypad->keys[group][bit];
-			}
-			keypad_press(cpu, group, bit);
-			if (changed) {
-				if (group == KEYGROUP_ON && bit == KEYBIT_ON) {
-					*changed = orig != keypad->on_pressed;
-				} else {
-					*changed = orig != keypad->keys[group][bit];
-				}
-			}
+			keypad_press(cpu, keygrps[i].group, keygrps[i].bit);
 			return &keygrps[i];
 		}
 	}	
