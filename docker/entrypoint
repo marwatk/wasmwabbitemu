@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -e
+
+cd /public
+find roms -iname "*.rom" -o -iname "*.bin" 2>/dev/null >> romlist.txt || true
+exec httpd -f -p 8080

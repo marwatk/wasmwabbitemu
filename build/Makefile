@@ -2,7 +2,7 @@
 # Type "make help" for usage help
 
 ifndef config
-  config=debug
+  config=release
 endif
 export config
 
