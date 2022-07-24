@@ -772,19 +772,25 @@ void keypad_press(CPU_t *cpu, int group, int bit)
 		cpu->pio.keypad->keys[group][bit] |= KEY_KEYBOARDPRESS;
 	}
 }
-
-keyprog_t *keypad_key_press(CPU_t *cpu, unsigned int vk)
-{
+keyprog_t *keypad_map_key(CPU_t *cpu, unsigned int vk) {
 	int i;
 	for(i = 0; i < NumElm(keygrps); i++)
 	{
 		if (keygrps[i].vk == vk)
 		{
-			keypad_press(cpu, keygrps[i].group, keygrps[i].bit);
 			return &keygrps[i];
 		}
 	}	
 	return NULL;
+}
+
+keyprog_t *keypad_key_press(CPU_t *cpu, unsigned int vk)
+{
+	keyprog_t *key = keypad_map_key(cpu, vk);
+	if ( key != NULL ) {
+		keypad_press(cpu, key->group, key->bit);
+	}
+	return key;
 }
 
 void keypad_release(CPU_t *cpu, int group, int bit)
@@ -800,22 +806,11 @@ void keypad_release(CPU_t *cpu, int group, int bit)
 }
 
 keyprog_t *keypad_key_release(CPU_t *cpu, unsigned int vk) {
-	keypad_t *keypad = cpu->pio.keypad;
-	
-	if (keypad == NULL)
-	{
-		return NULL;
+	keyprog_t *key = keypad_map_key(cpu, vk);
+	if ( key != NULL ) {
+		keypad_release(cpu, key->group, key->bit);
 	}
-
-	for (int i = 0; i < NumElm(keygrps); i++)
-	{
-		if (keygrps[i].vk == vk)
-		{	
-			keypad_release(cpu, keygrps[i].group, keygrps[i].bit);
-			return &keygrps[i];
-		}
-	}
-	return NULL;
+	return key;
 }
 
 #ifdef WINVER
