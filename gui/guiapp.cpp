@@ -210,7 +210,7 @@ void WabbitemuApp::keyUp(int group, int bit)
 	FinalizeButtons();
 }
 
-void WabbitemuApp::keyUp(int key)
+void WabbitemuApp::keyUp(int keycode)
 {
 	keyprog_t *kp = keypad_key_press(&theCalc->cpu, keycode);
 	if (kp) {
