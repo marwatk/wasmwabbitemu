@@ -138,18 +138,36 @@ void WabbitemuApp::tick() {
 		difference += TPF;
 	}
 
+  js_key jsKey;
 	SDL_Event e;
 	while (SDL_PollEvent(&e)) {  // poll until all events are handled!
     //std::cout << "Got SDL event\n";
 		//std::cout << "WXK_UP: " << WXK_UP << "\n";
 		//std::cout << "WXK_DOWN: " << WXK_DOWN << "\n";
-		if( e.type == SDL_KEYDOWN ) {
-			printf("Keydown: %d: [%c]\n", e.key.keysym.sym, e.key.keysym.sym);
-      keyDown(e.key.keysym.sym);
-		}
-		if( e.type == SDL_KEYUP ) {
-			keyUp(e.key.keysym.sym);
-		}
+    if( e.type == SDL_KEYDOWN || e.type == SDL_KEYUP ) {
+      printf("Key event: %d: [%c]\n", e.key.keysym.sym, e.key.keysym.sym);
+      if( !mapKey(e.key.keysym.sym, &jsKey) ) {
+        continue;
+      }
+      /*
+      keyprog_t *key = keypad_map_key(&theCalc->cpu, e.key.keysym.sym);
+      if ( key == NULL ) {
+        continue;
+      }
+      */
+
+      if( e.type == SDL_KEYDOWN ) {
+        printf("Keydown: %d: [%c], %d,%d\n",
+          e.key.keysym.sym, e.key.keysym.sym,
+          jsKey.group, jsKey.bit);
+        keyDown(jsKey.group, jsKey.bit);
+      }
+      if( e.type == SDL_KEYUP ) {
+        keyUp(jsKey.group, jsKey.bit);
+      }
+
+    }
+		
   }
 }
 
@@ -190,6 +208,7 @@ void LoadToLPCALC(INT_PTR lParam, LPTSTR filePath, SEND_FLAG sendLoc)
 }
 
 void WabbitemuApp::keyDown(int group, int bit) {
+		keypad_press(&theCalc->cpu, group, bit);
 		if ((theCalc->cpu.pio.keypad->keys[group][bit] & KEY_STATEDOWN) == 0) {
 			theCalc->cpu.pio.keypad->keys[group][bit] |= KEY_STATEDOWN;
 			FinalizeButtons();
@@ -198,9 +217,9 @@ void WabbitemuApp::keyDown(int group, int bit) {
 
 void WabbitemuApp::keyDown(int keycode)
 {
-	keyprog_t *kp = keypad_key_press(&theCalc->cpu, keycode);
-	if (kp) {
-		keyDown(kp->group, kp->bit);
+	keyprog_t *key = keypad_map_key(&theCalc->cpu, keycode);
+	if ( key != NULL ) {
+		keyDown(key->group, key->bit);
 	}
 }
 
@@ -212,9 +231,9 @@ void WabbitemuApp::keyUp(int group, int bit)
 
 void WabbitemuApp::keyUp(int keycode)
 {
-	keyprog_t *kp = keypad_key_press(&theCalc->cpu, keycode);
-	if (kp) {
-		keyUp(kp->group, kp->bit);
+	keyprog_t *key = keypad_map_key(&theCalc->cpu, keycode);
+	if ( key != NULL ) {
+		keyUp(key->group, key->bit);
 	}
 }
 

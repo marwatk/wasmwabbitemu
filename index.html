@@ -584,16 +584,22 @@ canvas {
       }
 
       function keypadEvent(event) {
+        simulateKeyEvent(event.data.up ? "keyup" : "keydown", 91, '`');
+        return;
         var id = event.currentTarget.id;
         var keyInt = serializeKey(parseInt(id[1]) & 0xFF, parseInt(id[2]) & 0xFF);
         var keycode = reverseKeyMap[keyInt];
         if (keycode == 0) {
-          log(`keypad id ${id} does not have mapping!`);
+          console.log(`keypad id ${id} does not have mapping!`);
           return;
         }
-        $("#canvas").trigger( $.Event( 
+        console.log("Firing keypad event");
+        $("body").trigger( $.Event( 
           event.data.up ? "keyup" : "keydown", 
-          { keyCode: keycode } ) );
+          { 
+            keyCode: keycode,
+            which: keycode,
+           } ) );
       }
 
       function serializeKey(group, bit) {
@@ -606,7 +612,7 @@ canvas {
       function inputToGroup(input) {
         return (input & 0xFF00) >> 16;
       }
-      /*
+      
 function simulateKeyEvent(eventType, keyCode, charCode) {
   var e = document.createEventObject ? document.createEventObject() : document.createEvent("Events");
   if (e.initEvent) e.initEvent(eventType, true, true);
@@ -628,7 +634,7 @@ function simulateKeyEvent(eventType, keyCode, charCode) {
     Module['canvas'].dispatchEvent ? Module['canvas'].dispatchEvent(e) : Module['canvas'].fireEvent("on" + eventType, e);
   }
 }
-*/
+
 
       generateKeymap();
       addKeypadHandlers();
