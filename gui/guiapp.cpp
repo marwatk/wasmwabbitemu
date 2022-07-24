@@ -27,52 +27,18 @@ int charToInt(char c) {
 	return c - 48;
 }
 
-bool fetchCalcInput(js_key *key) {
-	uint input = EM_ASM_INT(return fetchCalcInput());
+bool mapKey(int keycode, js_key *key) {
+	uint input = EM_ASM_INT(return mapKey($0), keycode);
 	if (input == 0) {
 		return false;
 	}
+
 	uint bit = input & 0xFF;
 	uint group = (input & 0xFF00) >> 8;
-	bool up = ((input & 0x10000) >> 16) != 0;
-	printf("Input: %d, Bit: %d, Group: %d, Up: %d\n", input, bit, group, up);
+	printf("Input: %d, Bit: %d, Group: %d\n", input, bit, group);
 
 	key->bit = bit;
 	key->group = group;
-	key->up = up;
-	return true;
-}
-
-void jsKey(bool up, int group, int bit) {
-	// I don't _think_ we need locking, but may need to investigate.
-	if (numKeypresses >= MAX_KEYPRESSES) {
-		puts("Discarding keys over threshhold\n");
-		return;
-	}
-
-	keyQueue[inkeyPressIdx].up = up;
-	keyQueue[inkeyPressIdx].group = group;
-	keyQueue[inkeyPressIdx].bit = bit;
-
-	inkeyPressIdx++;
-	if (inkeyPressIdx >= MAX_KEYPRESSES) {
-		inkeyPressIdx = 0;
-	}
-	numKeypresses++;
-}
-
-bool consumeJsKey(js_key *key) {
-	if (numKeypresses <= 0) {
-		return false;
-	}
-	key->up = keyQueue[outkeyPressIdx].up;
-	key->group = keyQueue[outkeyPressIdx].group;
-	key->bit = keyQueue[outkeyPressIdx].bit;
-	outkeyPressIdx++;
-	if (outkeyPressIdx >= MAX_KEYPRESSES) {
-		outkeyPressIdx = 0;
-	}
-	numKeypresses--;
 	return true;
 }
 
@@ -223,21 +189,33 @@ void LoadToLPCALC(INT_PTR lParam, LPTSTR filePath, SEND_FLAG sendLoc)
 	SendFile(lpCalc, filePath, sendLoc);
 }
 
+void WabbitemuApp::keyDown(int group, int bit) {
+		if ((theCalc->cpu.pio.keypad->keys[group][bit] & KEY_STATEDOWN) == 0) {
+			theCalc->cpu.pio.keypad->keys[group][bit] |= KEY_STATEDOWN;
+			FinalizeButtons();
+		}
+}
+
 void WabbitemuApp::keyDown(int keycode)
 {
 	keyprog_t *kp = keypad_key_press(&theCalc->cpu, keycode);
 	if (kp) {
-		if ((theCalc->cpu.pio.keypad->keys[kp->group][kp->bit] & KEY_STATEDOWN) == 0) {
-			theCalc->cpu.pio.keypad->keys[kp->group][kp->bit] |= KEY_STATEDOWN;
-			FinalizeButtons();
-		}
+		keyDown(kp->group, kp->bit);
 	}
+}
+
+void WabbitemuApp::keyUp(int group, int bit)
+{
+	keypad_release(&theCalc->cpu, group, bit);
+	FinalizeButtons();
 }
 
 void WabbitemuApp::keyUp(int key)
 {
-	keypad_key_release(&theCalc->cpu, key);
-	FinalizeButtons();
+	keyprog_t *kp = keypad_key_press(&theCalc->cpu, keycode);
+	if (kp) {
+		keyUp(kp->group, kp->bit);
+	}
 }
 
 void WabbitemuApp::FinalizeButtons() {
