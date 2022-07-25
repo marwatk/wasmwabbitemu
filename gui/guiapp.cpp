@@ -298,7 +298,7 @@ EM_BOOL loop(double time, void* userData) {
 
 int main(int argc, char * argv[]){
 	romPath[0] = 0;
-	strcpy(romPath, ROM_FILE);
+	//strcpy(romPath, ROM_FILE);
 	EM_ASM(
 		setRomPathPointer($0);
 		mainJs();

@@ -76,7 +76,7 @@ body {
 }
 
 #menu {
-  display: none;
+  display: block;
   position: fixed;
   padding: 1em;
   background-color: gray;
@@ -592,7 +592,7 @@ canvas {
         if( rom == "" ) {
           return;
         }
-        if ( rom.startsWith(fsPath) ) {
+        if ( rom.startsWith("/") ) {
           setRomPath(rom);
           return;
         }
@@ -750,7 +750,7 @@ canvas {
 
       generateKeymap();
       addKeypadHandlers();
-      //fetchServerRoms();
+      fetchServerRoms();
  
       function updateRomList() {
         var select = document.getElementById("rom");
@@ -773,6 +773,10 @@ canvas {
           option.value = serverRoms[i];
           select.add(option);
         }
+        option = document.createElement("option");
+        option.text = "/z.rom";
+        option.value = "/z.rom";
+        select.add(option);
       }
  
       function log(msg) {
