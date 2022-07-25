@@ -569,6 +569,12 @@ canvas {
 [[''],5,1],             [['1'],4,1],    [['2'],3,1],    [['3'],2,1], [['='],1,1],
 [['`'],5,0],            [['0'],4,0],    [['.'],3,0],    [['n'],2,0], [[Enter],1,0]];
 
+      function addKeypadHandlers() {
+        $("button.keypad")
+          .on("mousedown", { up: false }, keypadEvent)
+          .on("mouseup", { up: true }, keypadEvent);
+      }
+
       function basename(path) {
         var ar = path.split(/[\\/]/);
         var r = ar.pop();
@@ -586,18 +592,6 @@ canvas {
         FS.writeFile(fsPath + "/" + lastRomFile, rom);
         runSync();
       }
- 
-      function romSelected() {
-        var rom = document.getElementById("rom").value;
-        if( rom == "" ) {
-          return;
-        }
-        if ( rom.startsWith("/") ) {
-          setRomPath(rom);
-          return;
-        }
-        fetchAndLoadRom(rom);
-      }
 
       async function fetchAndLoadRom(url) {
         var response = await fetch(url);
@@ -612,9 +606,23 @@ canvas {
         runSync();
       }
  
-      function setRomPathPointer(pointer) {
-        log(`Rom path pointer: ${pointer}`);
-        romPathPointer = pointer;
+      async function fetchServerRoms() {
+        var response = await fetch("romlist.txt");
+        var i;
+        var roms;
+        var rom;
+        if (!response.ok) {
+          return;
+        }
+        const text = await response.text();
+        roms = text.split("\n");
+        for( i = 0; i < roms.length; i++ ) {
+          rom = roms[i];
+          if ( rom.length > 0 ) { 
+            serverRoms.push(rom);
+          }  
+        }
+        updateRomList();
       }
 
       function fsLoaded() {
@@ -639,6 +647,65 @@ canvas {
           }
         }
         updateRomList();
+      }
+
+      function generateKeymap() {
+        var i;
+        var j;
+        var keyCode;
+        var keyInt;
+        var keyCharOrCode;
+        for ( i = 0; i < keys.length; i++ ) {
+          keys[i] = keys[i];
+          for ( j = 0; j < keys[i][0].length; j++ ) {
+            keyCharOrCode = keys[i][0][j];
+            keyCode = typeof keyCharOrCode == 'string' ? keyCharOrCode.charCodeAt(0) : keyCharOrCode;
+            if (keyMap[keyCode]) {
+              console.log(`Warning: keyCode ${keyCode} already assigned`);
+            }
+            keyInt = serializeKey(keys[i][1], keys[i][2]);
+            keyMap[keyCode] = keyInt;
+          }
+        }
+      }
+  
+      function keypadEvent(event) {
+        var id = event.currentTarget.id;
+        var keyInt = serializeKey(parseInt(id[1]), parseInt(id[2]), event.data.up);
+        calcInputs.push(keyInt);        
+      }
+ 
+      function log(msg) {
+        var element = document.getElementById('output');
+        console.log(msg);
+        if (element) {
+          element.value += msg + "\n";
+          element.scrollTop = element.scrollHeight; // focus on bottom
+        }
+      }
+
+      function loopJs() {
+        if (Module.syncing) {
+          return false;
+        }
+        return true;
+      }
+  
+      function romSelected() {
+        var rom = document.getElementById("rom").value;
+        if( rom == "" ) {
+          return;
+        }
+        if ( rom.startsWith("/") ) {
+          setRomPath(rom);
+          return;
+        }
+        fetchAndLoadRom(rom);
+      }
+
+      function setRomPathPointer(pointer) {
+        log(`Rom path pointer: ${pointer}`);
+        romPathPointer = pointer;
       }
 
       function setRomPath(romPath) {
@@ -666,13 +733,23 @@ canvas {
           }
         });
       }
-      function loopJs() {
-        if (Module.syncing) {
-          return false;
-        }
-        return true;
+
+      function mapKey(keyCode) {
+        return keyMap[keyCode];
       }
-      
+
+      function romSelected() {
+        var rom = document.getElementById("rom").value;
+        if( rom == "" ) {
+          return;
+        }
+        if ( rom.startsWith("/") ) {
+          setRomPath(rom);
+          return;
+        }
+        fetchAndLoadRom(rom);
+      }
+
       function runSync() {
         Module.syncing = true;
         FS.syncfs(function (err) {
@@ -684,32 +761,7 @@ canvas {
           }
         });
       }
- 
-      async function fetchServerRoms() {
-        var response = await fetch("romlist.txt");
-        var i;
-        var roms;
-        var rom;
-        if (!response.ok) {
-          return;
-        }
-        const text = await response.text();
-        roms = text.split("\n");
-        for( i = 0; i < roms.length; i++ ) {
-          rom = roms[i];
-          if ( rom.length > 0 ) { 
-            serverRoms.push(rom);
-          }  
-        }
-        updateRomList();
-      }
-  
-      function keypadEvent(event) {
-        var id = event.currentTarget.id;
-        var keyInt = serializeKey(parseInt(id[1]), parseInt(id[2]), event.data.up);
-        calcInputs.push(keyInt);        
-      }
-
+      
       function serializeKey(group, bit, up) {
         var keyInt = 0x20000 | (group << 8) | bit;
         if ( up ) {
@@ -717,41 +769,12 @@ canvas {
         }
         return keyInt;
       }
-
-      function generateKeymap() {
-        var i;
-        var j;
-        var keyCode;
-        var keyInt;
-        var keyCharOrCode;
-        for ( i = 0; i < keys.length; i++ ) {
-          keys[i] = keys[i];
-          for ( j = 0; j < keys[i][0].length; j++ ) {
-            keyCharOrCode = keys[i][0][j];
-            keyCode = typeof keyCharOrCode == 'string' ? keyCharOrCode.charCodeAt(0) : keyCharOrCode;
-            if (keyMap[keyCode]) {
-              console.log(`Warning: keyCode ${keyCode} already assigned`);
-            }
-            keyInt = serializeKey(keys[i][1], keys[i][2]);
-            keyMap[keyCode] = keyInt;
-          }
-        }
-      }
-      function addKeypadHandlers() {
-        $("button.keypad")
-          .on("mousedown", { up: false }, keypadEvent)
-          .on("mouseup", { up: true }, keypadEvent);
+       
+      function setRomPathPointer(pointer) {
+        log(`Rom path pointer: ${pointer}`);
+        romPathPointer = pointer;
       }
 
-      function mapKey(keyCode) {
-        return keyMap[keyCode];
-      }
-
-
-      generateKeymap();
-      addKeypadHandlers();
-      fetchServerRoms();
- 
       function updateRomList() {
         var select = document.getElementById("rom");
         var i;
@@ -778,15 +801,10 @@ canvas {
         option.value = "/z.rom";
         select.add(option);
       }
- 
-      function log(msg) {
-        var element = document.getElementById('output');
-        console.log(msg);
-        if (element) {
-          element.value += msg + "\n";
-          element.scrollTop = element.scrollHeight; // focus on bottom
-        }
-      }
+
+      generateKeymap();
+      addKeypadHandlers();
+      fetchServerRoms();
 
       var Module = {
         preRun: [],
