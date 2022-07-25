@@ -281,9 +281,9 @@ EM_BOOL loop(double time, void* userData) {
 }
 
 EM_BOOL loop2(double time, void* userData) {
-  if (EM_ASM_INT( return loopJs(); ) == 0) {
-    return EM_TRUE;
-  }
+  //if (EM_ASM_INT( return loopJs(); ) == 0) {
+  //  return EM_TRUE;
+  //}
  
   if (!initDone && romPath[0] != 0) {
     printf("Initializing with rom path %s\n", romPath);
@@ -313,7 +313,7 @@ int main(int argc, char * argv[]){
 
 int main2(int argc, char * argv[]){
 	romPath[0] = 0;
-
+	strcpy(romPath, ROM_FILE);
 	EM_ASM(
 		setRomPathPointer($0);
 		mainJs();
