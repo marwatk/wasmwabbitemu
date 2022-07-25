@@ -15,7 +15,11 @@ LPCALC theCalc;
 SDL_Renderer *renderer = NULL;      // Pointer for the renderer
 SDL_Window *window = NULL;      // Pointer for the window
 
-#define ROM_FILE "z.rom"
+#define MAX_PATH_LEN 2048
+
+char romPath[MAX_PATH_LEN];
+bool initDone = false;
+int tickNum = 0;
 
 bool mapKey(int keycode, js_key *key) {
 	uint input = EM_ASM_INT(return mapKey($0), keycode);
@@ -42,7 +46,7 @@ bool WabbitemuApp::init() {
 		calc_slot_free(lpCalc);
 		BOOL loadedRom = FALSE;
 		
-		if (rom_load(lpCalc, ROM_FILE)) {
+		if (rom_load(lpCalc, romPath)) {
 			puts("Second load worked\n");
 			loadedRom = TRUE;
 		}
@@ -94,10 +98,50 @@ unsigned WabbitemuApp::GetTickCount()
 		return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 }
 
+void WabbitemuApp::handleEvents() {
+  js_key jsKey;
+	SDL_Event e;
+	while (SDL_PollEvent(&e)) {  // poll until all events are handled!
+    if( e.type == SDL_KEYDOWN || e.type == SDL_KEYUP ) {
+      printf("Tick %d: Key event: %d: [%c]\n", tickNum, e.key.keysym.sym, e.key.keysym.sym);
+      if( !mapKey(e.key.keysym.sym, &jsKey) ) {
+        continue;
+      }
+      if( e.type == SDL_KEYDOWN ) {
+        printf("Keydown: %d: [%c], %d,%d\n",
+          e.key.keysym.sym, e.key.keysym.sym,
+          jsKey.group, jsKey.bit);
+        keyDown(jsKey.group, jsKey.bit);
+      }
+      if( e.type == SDL_KEYUP ) {
+        printf("Keyup: %d: [%c], %d,%d\n",
+          e.key.keysym.sym, e.key.keysym.sym,
+          jsKey.group, jsKey.bit);
+        keyUp(jsKey.group, jsKey.bit);
+      }
+			// Only allow one key event per cpu tick
+			return;
+    }
+  }
+	if ( EM_ASM_INT(return calcInputs.length) > 0 ) {
+		int input = EM_ASM_INT(return calcInputs.shift());
+		int bit = input & 0xFF;
+		int group = (input & 0xFF00) >> 8;
+		bool up = (input & 0x10000) != 0;
+		if ( up ) {
+        keyUp(group, bit);
+		}
+		else {
+			keyDown(group, bit);
+		}
+	}	
+}
 
-int tickNum = 0;
 void WabbitemuApp::tick() {
 	tickNum++;
+	if (tickNum % 100 == 0) {
+		printf("Tick %d\n", tickNum);
+	}
 	static int difference;
 	static unsigned prevTimer;
 	unsigned dwTimer = GetTickCount();
@@ -128,45 +172,7 @@ void WabbitemuApp::tick() {
 	} else {
 		difference += TPF;
 	}
-
-  js_key jsKey;
-	SDL_Event e;
-	bool didKey = false;
-	while (SDL_PollEvent(&e)) {  // poll until all events are handled!
-    if( e.type == SDL_KEYDOWN || e.type == SDL_KEYUP ) {
-      printf("Tick %d: Key event: %d: [%c]\n", tickNum, e.key.keysym.sym, e.key.keysym.sym);
-      if( !mapKey(e.key.keysym.sym, &jsKey) ) {
-        continue;
-      }
-      if( e.type == SDL_KEYDOWN ) {
-        printf("Keydown: %d: [%c], %d,%d\n",
-          e.key.keysym.sym, e.key.keysym.sym,
-          jsKey.group, jsKey.bit);
-        keyDown(jsKey.group, jsKey.bit);
-      }
-      if( e.type == SDL_KEYUP ) {
-        printf("Keyup: %d: [%c], %d,%d\n",
-          e.key.keysym.sym, e.key.keysym.sym,
-          jsKey.group, jsKey.bit);
-        keyUp(jsKey.group, jsKey.bit);
-      }
-			// Only allow one key event per cpu tick
-			didKey = true;
-			break;
-    }
-  }
-	if ( !didKey && EM_ASM_INT(return calcInputs.length) > 0 ) {
-		int input = EM_ASM_INT(return calcInputs.shift());
-		int bit = input & 0xFF;
-		int group = (input & 0xFF00) >> 8;
-		bool up = (input & 0x10000) != 0;
-		if ( up ) {
-        keyUp(group, bit);
-		}
-		else {
-			keyDown(group, bit);
-		}
-	}
+	handleEvents();
 }
 
 void WabbitemuApp::render() {
@@ -175,6 +181,7 @@ void WabbitemuApp::render() {
 	if (theCalc == NULL) {
 		return;
 	}
+	if( tickNum % 100 == 0 ) printf("Rendering\n");
 	LCD_t *lcd = theCalc->cpu.pio.lcd;
 	unsigned char *screen;
 	screen = LCD_image( lcd ) ;
@@ -252,9 +259,23 @@ void WabbitemuApp::FinalizeButtons() {
 WabbitemuApp app;
 
 EM_BOOL loop(double time, void* userData) {
-  app.tick();
-  //puts("Looping\n");
-  // Return true to keep the loop running.
+  if (EM_ASM_INT( return loopJs(); ) == 0) {
+    return EM_TRUE;
+  }
+ 
+  if (!initDone && romPath[0] != 0) {
+    printf("Initializing with rom path %s\n", romPath);
+    if (!app.init()) {
+      printf("Init failed\n");
+      romPath[0] = 0;
+    }
+		printf("Init succeeded\n");
+		EM_ASM(calcLoaded());
+		initDone = true;
+	}
+	if (initDone) {
+		app.tick();
+	}
   return EM_TRUE;
 }
 
@@ -278,21 +299,12 @@ void test() {
 }
 
 int main(int argc, char * argv[]){
-	printf("Pre app\n");
-	if (!app.init()) {
-		puts("Init failed\n");
-		return 1;
-	}
-	printf("Post init\n");
-	//emscripten_set_main_loop(voidLoop, 0, false);
+	romPath[0] = 0;
+
+	EM_ASM(
+		setRomPathPointer($0);
+		mainJs();
+	, &romPath);
+
 	emscripten_request_animation_frame_loop(loop, 0);
-	//test();
-	
-	
-	//while(true){
-    //    SDL_Delay(10);  // setting some Delay
-	//	app.tick();
-	//}
 }
-
-

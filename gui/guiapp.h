@@ -41,6 +41,7 @@ public:
 	bool init();
 	int exit();
 	void tick();
+	void handleEvents();
 
 	virtual bool OnInit();
 	virtual int OnExit();

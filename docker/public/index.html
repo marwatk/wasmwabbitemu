@@ -63,48 +63,6 @@
         to {transform: rotate(360deg);}
       }
 
-      #status {
-        display: inline-block;
-        vertical-align: top;
-        margin-top: 30px;
-        margin-left: 20px;
-        font-weight: bold;
-        color: rgb(120, 120, 120);
-      }
-
-      #progress {
-        height: 20px;
-        width: 300px;
-      }
-
-      #controls {
-        display: inline-block;
-        float: right;
-        vertical-align: top;
-        margin-top: 30px;
-        margin-right: 20px;
-      }
-
-      #output {
-        width: 100%;
-        height: 200px;
-        margin: 0 auto;
-        margin-top: 10px;
-        border-left: 0px;
-        border-right: 0px;
-        padding-left: 0px;
-        padding-right: 0px;
-        display: block;
-        background-color: black;
-        color: white;
-        font-family: 'Lucida Console', Monaco, monospace;
-        outline: none;
-      }
-
-
-
-
-
 
 
 *{
@@ -115,6 +73,55 @@
 
 body {
   font-size: 3vmin;
+}
+
+#menu {
+  display: block;
+  position: fixed;
+  padding: 1em;
+  background-color: gray;
+  color: black;
+  top: 5%;
+  left: 5%;
+  right: 5%;
+  bottom: 20%;
+}
+ 
+ 
+#status {
+  display: block;
+  font-weight: bold;
+  color: black;
+}
+ 
+#menu p {
+  margin-top: 2em;
+}
+ 
+#progress {
+  height: 20px;
+  width: 300px;
+}
+ 
+#controls {
+  margin-top: 30px;
+  margin-right: 20px;
+}
+ 
+#output {
+  width: 100%;
+  height: 200px;
+  margin: 0 auto;
+  margin-top: 0px;
+  border-left: 0px;
+  border-right: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  display: block;
+  background-color: black;
+  color: white;
+  font-family: 'Lucida Console', Monaco, monospace;
+  outline: none;
 }
 
 #calc {
@@ -420,19 +427,23 @@ canvas {
     </style>
   </head>
   <body>
-    <div class="spinner" id='spinner'></div>
-    <div class="emscripten" id="status">Downloading...</div>
-
-<span id='controls'>
-  <span><input type="checkbox" id="resize">Resize canvas</span>
-  <span><input type="checkbox" id="pointerLock" checked>Lock/hide mouse pointer &nbsp;&nbsp;&nbsp;</span>
-  <span><input type="button" value="Fullscreen" onclick="Module.requestFullscreen(document.getElementById('pointerLock').checked, 
-                                                                            document.getElementById('resize').checked)">
-  </span>
-</span>
-
-    <div class="emscripten">
-      <progress value="0" max="100" id="progress" hidden=1></progress>
+    <div id="menu" class="menu">
+      <div class="spinner" id='spinner'></div>
+      <div class="emscripten" id="status">Downloading...</div>
+      <div class="emscripten">
+        <progress value="0" max="100" id="progress" hidden=1></progress>
+      </div>
+      <span id='controls'>
+        <span><input type="button" value="Fullscreen" onclick="Module.requestFullscreen(document.getElementById('pointerLock').checked, 
+                                                                                  document.getElementById('resize').checked)">
+        </span>
+      </span>
+      <p>ROM Selection:</p>
+      <select id="rom" onchange="javascript:romSelected()">
+        <option value="">Choose ROM</option>
+      </select>
+      <p>Emulator Log:</p>
+      <textarea id="output" rows="8" readonly></textarea>
     </div>
     
     <div id='calc' class='calc ti85'>
@@ -514,7 +525,13 @@ canvas {
     <textarea id="output" rows="8"></textarea>
 
     <script type='text/javascript'>
+      const fsPath = "/idbfs";
+      const lastRomFile = "lastrom.txt";
+      var romSet = false;
+      var romPathPointer = 0;
       var calcInputs = [];
+      var browserRoms = [];
+      var serverRoms = [];
       var statusElement = document.getElementById('status');
       var progressElement = document.getElementById('progress');
       var spinnerElement = document.getElementById('spinner');
@@ -552,14 +569,153 @@ canvas {
 [[''],5,1],             [['1'],4,1],    [['2'],3,1],    [['3'],2,1], [['='],1,1],
 [['`'],5,0],            [['0'],4,0],    [['.'],3,0],    [['n'],2,0], [[Enter],1,0]];
 
-      function addKeypadHandlers() {
-        $("button.keypad")
-          .on("mousedown", { up: false }, keypadEvent)
-          .on("mouseup", { up: true }, keypadEvent);
+      function basename(path) {
+        var ar = path.split(/[\\/]/);
+        var r = ar.pop();
+        if ( r == "" ) {
+          r = ar.pop();
+        }
+        return r;
+      }
+ 
+      function calcLoaded() {
+        log("Calc loaded!");
+        document.getElementById("menu").style.display = "none";
+        rom = UTF8ToString(romPathPointer, 2048);
+        log("Setting last rom to [" + rom + "]");
+        FS.writeFile(fsPath + "/" + lastRomFile, rom);
+        runSync();
+      }
+ 
+      function romSelected() {
+        var rom = document.getElementById("rom").value;
+        if( rom == "" ) {
+          return;
+        }
+        if ( rom.startsWith(fsPath) ) {
+          setRomPath(rom);
+          return;
+        }
+        fetchAndLoadRom(rom);
       }
 
-      function mapKey(keyCode) {
-        return keyMap[keyCode];
+      async function fetchAndLoadRom(url) {
+        var response = await fetch(url);
+        if (!response.ok) {
+          log("Error loading rom: " + response.statusText);
+          return;
+        }
+        var romContent = await response.arrayBuffer();
+        var path = fsPath + "/" + basename(url);
+        log(`Saving rom to [${path}]`);
+        FS.writeFile(path, new DataView(romContent));
+        runSync();
+      }
+ 
+      function setRomPathPointer(pointer) {
+        log(`Rom path pointer: ${pointer}`);
+        romPathPointer = pointer;
+      }
+
+      function fsLoaded() {
+        var files = Object.keys(FS.lookupPath(fsPath).node.contents);
+        var file;
+        var lastRom = "";
+        var i;
+        var path;
+        for( i = 0; i < files.length; i++ ) {
+          file = files[i];
+          path = fsPath + "/" + file;
+          if (file == lastRomFile) {
+            lastRom = FS.readFile(path, { encoding: "utf8" });
+          }
+          else {
+            browserRoms.push(path);
+          }
+        }
+        for( i = 0; i < browserRoms.length; i++ ) {
+          if( lastRom == browserRoms[i] ) {
+            setRomPath(fsPath + "/" + lastRom);
+          }
+        }
+        updateRomList();
+      }
+
+      function setRomPath(romPath) {
+        if (romPathPointer == 0) {
+          log("Attempted to set romPath with zero romPathPointer!");
+          return;
+        }
+        log(`Setting rom path [${romPath}]`);
+        stringToUTF8(romPath, romPathPointer, 2048);
+      }
+ 
+      function mainJs() {
+        log("main() has started");
+        log("Creating IDBFS filesystem");
+        Module.syncing = true;
+        FS.mkdir(fsPath);
+        FS.mount(IDBFS, {}, fsPath);
+        FS.syncfs(true, function (err) {
+          Module.syncing = false;
+          if ( err ) {
+            log("Error loading idbfs: " + err);
+          } else {
+            log("IDBFS filesystem loaded");
+            fsLoaded();
+          }
+        });
+      }
+      function loopJs() {
+        if (Module.syncing) {
+          return false;
+        }
+        return true;
+      }
+      
+      function runSync() {
+        Module.syncing = true;
+        FS.syncfs(function (err) {
+          Module.syncing = false;
+          if ( err ) {
+            log("Error syncing idbfs: " + err);
+          } else {
+            log("IDBFS filesystem synced");
+          }
+        });
+      }
+ 
+      async function fetchServerRoms() {
+        var response = await fetch("romlist.txt");
+        var i;
+        var roms;
+        var rom;
+        if (!response.ok) {
+          return;
+        }
+        const text = await response.text();
+        roms = text.split("\n");
+        for( i = 0; i < roms.length; i++ ) {
+          rom = roms[i];
+          if ( rom.length > 0 ) { 
+            serverRoms.push(rom);
+          }  
+        }
+        updateRomList();
+      }
+  
+      function keypadEvent(event) {
+        var id = event.currentTarget.id;
+        var keyInt = serializeKey(parseInt(id[1]), parseInt(id[2]), event.data.up);
+        calcInputs.push(keyInt);        
+      }
+
+      function serializeKey(group, bit, up) {
+        var keyInt = 0x20000 | (group << 8) | bit;
+        if ( up ) {
+          keyInt |= 0x10000;
+        }
+        return keyInt;
       }
 
       function generateKeymap() {
@@ -581,23 +737,52 @@ canvas {
           }
         }
       }
-
-      function keypadEvent(event) {
-        var id = event.currentTarget.id;
-        var keyInt = serializeKey(parseInt(id[1]), parseInt(id[2]), event.data.up);
-        calcInputs.push(keyInt);        
+      function addKeypadHandlers() {
+        $("button.keypad")
+          .on("mousedown", { up: false }, keypadEvent)
+          .on("mouseup", { up: true }, keypadEvent);
       }
 
-      function serializeKey(group, bit, up) {
-        var keyInt = 0x20000 | (group << 8) | bit;
-        if ( up ) {
-          keyInt |= 0x10000;
-        }
-        return keyInt;
+      function mapKey(keyCode) {
+        return keyMap[keyCode];
       }
+
 
       generateKeymap();
       addKeypadHandlers();
+      fetchServerRoms();
+ 
+      function updateRomList() {
+        var select = document.getElementById("rom");
+        var i;
+        var option;
+        while( select.length > 1 ) {
+          select.remove(1);
+        }
+        serverRoms.sort();
+        browserRoms.sort();
+        for( i = 0; i < browserRoms.length; i++ ) {
+          option = document.createElement("option");
+          option.text = browserRoms[i];
+          option.value = browserRoms[i];
+          select.add(option);
+        }
+        for( i = 0; i < serverRoms.length; i++ ) {
+          option = document.createElement("option");
+          option.text = serverRoms[i];
+          option.value = serverRoms[i];
+          select.add(option);
+        }
+      }
+ 
+      function log(msg) {
+        var element = document.getElementById('output');
+        console.log(msg);
+        if (element) {
+          element.value += msg + "\n";
+          element.scrollTop = element.scrollHeight; // focus on bottom
+        }
+      }
 
       var Module = {
         preRun: [],
