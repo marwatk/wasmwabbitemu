@@ -275,12 +275,12 @@ void test() {
 
 WabbitemuApp app;
 
-EM_BOOL loop(double time, void* userData) {
+EM_BOOL loop1(double time, void* userData) {
 	app.tick();
 	return EM_TRUE;
 }
 
-EM_BOOL loop2(double time, void* userData) {
+EM_BOOL loop(double time, void* userData) {
   //if (EM_ASM_INT( return loopJs(); ) == 0) {
   //  return EM_TRUE;
   //}
@@ -301,7 +301,7 @@ EM_BOOL loop2(double time, void* userData) {
   return EM_TRUE;
 }
 
-int main(int argc, char * argv[]){
+int main0(int argc, char * argv[]){
 		printf("Pre app\n");
     if (!app.init()) {
         puts("Init failed\n");
@@ -311,7 +311,7 @@ int main(int argc, char * argv[]){
     emscripten_request_animation_frame_loop(loop, 0);
 }
 
-int main2(int argc, char * argv[]){
+int main(int argc, char * argv[]){
 	romPath[0] = 0;
 	strcpy(romPath, ROM_FILE);
 	EM_ASM(
