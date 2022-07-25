@@ -258,6 +258,21 @@ void WabbitemuApp::FinalizeButtons() {
 	}
 }
 
+void test() {
+  FILE *file = fopen("test.txt", "rb");
+  if (!file) {
+    printf("cannot open file\n");
+    return;
+  }
+  while (!feof(file)) {
+    char c = fgetc(file);
+    if (c != EOF) {
+      putchar(c);
+    }
+  }
+  fclose (file);
+}
+
 WabbitemuApp app;
 
 EM_BOOL loop(double time, void* userData) {
@@ -286,23 +301,8 @@ EM_BOOL loop2(double time, void* userData) {
   return EM_TRUE;
 }
 
-void test() {
-  FILE *file = fopen("test.txt", "rb");
-  if (!file) {
-    printf("cannot open file\n");
-    return;
-  }
-  while (!feof(file)) {
-    char c = fgetc(file);
-    if (c != EOF) {
-      putchar(c);
-    }
-  }
-  fclose (file);
-}
-
 int main(int argc, char * argv[]){
-    printf("Pre app\n");
+		printf("Pre app\n");
     if (!app.init()) {
         puts("Init failed\n");
         return 1;
