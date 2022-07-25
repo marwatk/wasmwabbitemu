@@ -76,7 +76,7 @@ body {
 }
 
 #menu {
-  display: block;
+  display: none;
   position: fixed;
   padding: 1em;
   background-color: gray;
@@ -750,7 +750,7 @@ canvas {
 
       generateKeymap();
       addKeypadHandlers();
-      fetchServerRoms();
+      //fetchServerRoms();
  
       function updateRomList() {
         var select = document.getElementById("rom");

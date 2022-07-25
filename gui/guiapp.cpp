@@ -16,6 +16,7 @@ SDL_Renderer *renderer = NULL;      // Pointer for the renderer
 SDL_Window *window = NULL;      // Pointer for the window
 
 #define MAX_PATH_LEN 2048
+#define ROM_FILE "z.rom"
 
 char romPath[MAX_PATH_LEN];
 bool initDone = false;
@@ -46,7 +47,7 @@ bool WabbitemuApp::init() {
 		calc_slot_free(lpCalc);
 		BOOL loadedRom = FALSE;
 		
-		if (rom_load(lpCalc, romPath)) {
+		if (rom_load(lpCalc, ROM_FILE)) {
 			puts("Second load worked\n");
 			loadedRom = TRUE;
 		}
@@ -99,7 +100,7 @@ unsigned WabbitemuApp::GetTickCount()
 }
 
 void WabbitemuApp::handleEvents() {
-  js_key jsKey;
+	js_key jsKey;
 	SDL_Event e;
 	while (SDL_PollEvent(&e)) {  // poll until all events are handled!
     if( e.type == SDL_KEYDOWN || e.type == SDL_KEYUP ) {
@@ -173,6 +174,7 @@ void WabbitemuApp::tick() {
 		difference += TPF;
 	}
 	handleEvents();
+
 }
 
 void WabbitemuApp::render() {
@@ -259,6 +261,11 @@ void WabbitemuApp::FinalizeButtons() {
 WabbitemuApp app;
 
 EM_BOOL loop(double time, void* userData) {
+	app.tick();
+	return EM_TRUE;
+}
+
+EM_BOOL loop2(double time, void* userData) {
   if (EM_ASM_INT( return loopJs(); ) == 0) {
     return EM_TRUE;
   }
@@ -279,10 +286,6 @@ EM_BOOL loop(double time, void* userData) {
   return EM_TRUE;
 }
 
-void voidLoop() {
-	app.tick();
-}
-
 void test() {
   FILE *file = fopen("test.txt", "rb");
   if (!file) {
@@ -299,6 +302,16 @@ void test() {
 }
 
 int main(int argc, char * argv[]){
+    printf("Pre app\n");
+    if (!app.init()) {
+        puts("Init failed\n");
+        return 1;
+    }
+    printf("Post init\n");
+    emscripten_request_animation_frame_loop(loop, 0);
+}
+
+int main2(int argc, char * argv[]){
 	romPath[0] = 0;
 
 	EM_ASM(

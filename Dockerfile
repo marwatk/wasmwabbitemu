@@ -51,6 +51,7 @@ RUN set -ex; \
     cp \
       /opt/src/bin/wxWabbitemu.js \
       /opt/src/bin/wxWabbitemu.wasm \
+      /opt/src/bin/wxWabbitemu.data \
       /opt/root/public/; \
     chmod -R 444 /opt/root; \
     chmod 555 \
