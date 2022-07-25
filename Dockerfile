@@ -38,7 +38,7 @@ COPY . /opt/src/
 # embedded with a fixed version instead.
 RUN set -ex; \
     env; \
-    # cp TI85.ROM build/z.rom; \
+    cp TI85.ROM build/z.rom; \
     # Display what we're going to do, useful for debuggin
     emmake make -n; \
     emmake make -j8; \

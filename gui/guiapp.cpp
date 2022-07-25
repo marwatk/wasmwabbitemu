@@ -140,9 +140,9 @@ void WabbitemuApp::handleEvents() {
 
 void WabbitemuApp::tick() {
 	tickNum++;
-	if (tickNum % 100 == 0) {
-		printf("Tick %d\n", tickNum);
-	}
+//	if (tickNum % 100 == 0) {
+//		printf("Tick %d\n", tickNum);
+//	}
 	static int difference;
 	static unsigned prevTimer;
 	unsigned dwTimer = GetTickCount();
@@ -183,7 +183,6 @@ void WabbitemuApp::render() {
 	if (theCalc == NULL) {
 		return;
 	}
-	if( tickNum % 100 == 0 ) printf("Rendering\n");
 	LCD_t *lcd = theCalc->cpu.pio.lcd;
 	unsigned char *screen;
 	screen = LCD_image( lcd ) ;
