@@ -1,4 +1,5 @@
-wxWabbitemu - a cross-platform TI-8x emulator based on Wabbitemu
+wasmWabbitemu - a cross-platform TI-8x emulator based on Wabbitemu
+Copyright (C) 2022 Marcus Watkins
 Copyright (C) 2016 Albert Huang + Chris Shappell
 Copyright (C) 2015 Revolution Software
 (with Spencer Putt, Don Straney, Chris Shappell, and James Montelongo)

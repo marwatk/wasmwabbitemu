@@ -39,7 +39,7 @@ ifeq ($(config),debug)
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS) -lidbfs.js --preload-file z.rom
+  LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS) -lidbfs.js
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -61,7 +61,7 @@ ifeq ($(config),release)
   LIBS      += 
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
-  LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS) -lidbfs.js --preload-file z.rom
+  LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS) -lidbfs.js
   define PREBUILDCMDS
   endef
   define PRELINKCMDS

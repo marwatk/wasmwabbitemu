@@ -28,7 +28,6 @@ typedef struct ParsedCmdArgs
 	BOOL force_focus;
 } ParsedCmdArgs_t;
 
-
 class WabbitemuApp
 {
 public:
