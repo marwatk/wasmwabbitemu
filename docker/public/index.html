@@ -443,7 +443,7 @@ canvas {
       </span>
       <p>ROM Selection:</p>
       <select id="rom" onchange="javascript:romSelected()">
-        <option value="">Choose ROM</option>
+        <option value="">Choose Server ROM</option>
       </select>
       <p>Load a ROM File: <input type="file" id="rom-upload" accept=".bin,.rom" /></p>
       <p>Emulator Log:</p>
@@ -704,8 +704,7 @@ canvas {
       }
   
       function mainJs() {
-        log("main() has started");
-        log("Creating IDBFS filesystem");
+        log("main() has started, Creating IDBFS filesystem");
         Module.syncing = true;
         FS.mkdir(fsPath);
         FS.mount(IDBFS, {}, fsPath);
@@ -724,8 +723,8 @@ canvas {
         return keyMap[keyCode];
       }
 
-      function romSelected() {
-        var rom = document.getElementById("rom").value;
+      function romSelected() {        
+        var rom = $("#rom").value();
         if( rom == "" ) {
           return;
         }
@@ -774,30 +773,27 @@ canvas {
       }
 
       function updateRomList() {
-        var select = document.getElementById("rom");
-        var i;
-        var option;
-        while( select.length > 1 ) {
-          select.remove(1);
-        }
+        var select = $('#rom');
+        select.empty();
+        select.append($('<option>', {
+          value: "",
+          text: 'Choose ROM'
+        }));
+
         serverRoms.sort();
         browserRoms.sort();
         for( i = 0; i < browserRoms.length; i++ ) {
-          option = document.createElement("option");
-          option.text = browserRoms[i];
-          option.value = browserRoms[i];
-          select.add(option);
+          select.append($('<option>', {
+            value: browserRoms[i],
+            text: basename(browserRoms[i]) + " (Loaded)",
+          }));
         }
         for( i = 0; i < serverRoms.length; i++ ) {
-          option = document.createElement("option");
-          option.text = serverRoms[i];
-          option.value = serverRoms[i];
-          select.add(option);
+          select.append($('<option>', {
+            value: serverRoms[i],
+            text: basename(serverRoms[i]) + " (Loaded)",
+          }));
         }
-        option = document.createElement("option");
-        option.text = "/z.rom";
-        option.value = "/z.rom";
-        select.add(option);
       }
 
       async function uploadRom() {
