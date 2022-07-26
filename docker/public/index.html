@@ -445,6 +445,7 @@ canvas {
       <select id="rom" onchange="javascript:romSelected()">
         <option value="">Choose ROM</option>
       </select>
+      <p>Load a ROM File: <input type="file" id="rom-upload" accept=".bin,.rom" /></p>
       <p>Emulator Log:</p>
       <textarea id="output" rows="8" readonly></textarea>
     </div>
@@ -578,6 +579,10 @@ canvas {
           .on("mouseup", { up: true }, keypadEvent);
       }
 
+      function addUploadHandler() {
+        $("#rom-upload").on("change", uploadRom);
+      }
+
       function basename(path) {
         var ar = path.split(/[\\/]/);
         var r = ar.pop();
@@ -587,11 +592,11 @@ canvas {
         return r;
       }
  
-      function calcLoaded() {
-        log("Calc loaded!");
-        document.getElementById("menu").style.display = "none";
-        rom = UTF8ToString(romPathPointer, 2048);
-        log("Setting last rom to [" + rom + "]");
+      function calcLoaded(rom) {
+        var rom = UTF8ToString(romPathPointer, 2048);
+        log(`Calc loaded [${rom}]!`);
+        $("#menu").hide();
+        log(`Setting last rom to [${rom}]`);
         FS.writeFile(fsPath + "/" + lastRomFile, rom);
         runSync();
       }
@@ -606,7 +611,9 @@ canvas {
         var path = fsPath + "/" + basename(url);
         log(`Saving rom to [${path}]`);
         FS.writeFile(path, new DataView(romContent));
-        runSync();
+        runSync(function() {
+          setRomPath(path);
+        });
       }
  
       async function fetchServerRoms() {
@@ -639,6 +646,7 @@ canvas {
           path = fsPath + "/" + file;
           if (file == lastRomFile) {
             lastRom = FS.readFile(path, { encoding: "utf8" });
+            log(`Lastrom file containted [${lastRom}]`);
           }
           else {
             browserRoms.push(path);
@@ -646,7 +654,8 @@ canvas {
         }
         for( i = 0; i < browserRoms.length; i++ ) {
           if( lastRom == browserRoms[i] ) {
-            setRomPath(fsPath + "/" + lastRom);
+            log("Last rom found in persistent storage, loading");
+            setRomPath(lastRom);
           }
         }
         updateRomList();
@@ -694,32 +703,6 @@ canvas {
         return true;
       }
   
-      function romSelected() {
-        var rom = document.getElementById("rom").value;
-        if( rom == "" ) {
-          return;
-        }
-        if ( rom.startsWith("/") ) {
-          setRomPath(rom);
-          return;
-        }
-        fetchAndLoadRom(rom);
-      }
-
-      function setRomPathPointer(pointer) {
-        log(`Rom path pointer: ${pointer}`);
-        romPathPointer = pointer;
-      }
-
-      function setRomPath(romPath) {
-        if (romPathPointer == 0) {
-          log("Attempted to set romPath with zero romPathPointer!");
-          return;
-        }
-        log(`Setting rom path [${romPath}]`);
-        stringToUTF8(romPath, romPathPointer, 2048);
-      }
- 
       function mainJs() {
         log("main() has started");
         log("Creating IDBFS filesystem");
@@ -752,8 +735,8 @@ canvas {
         }
         fetchAndLoadRom(rom);
       }
-
-      function runSync() {
+ 
+      function runSync(cb) {
         Module.syncing = true;
         FS.syncfs(function (err) {
           Module.syncing = false;
@@ -761,6 +744,9 @@ canvas {
             log("Error syncing idbfs: " + err);
           } else {
             log("IDBFS filesystem synced");
+            if ( cb ) {
+              cb();
+            }
           }
         });
       }
@@ -772,10 +758,19 @@ canvas {
         }
         return keyInt;
       }
-       
+
       function setRomPathPointer(pointer) {
         log(`Rom path pointer: ${pointer}`);
         romPathPointer = pointer;
+      }
+
+      function setRomPath(romPath) {
+        if (romPathPointer == 0) {
+          log("Attempted to set romPath with zero romPathPointer!");
+          return;
+        }
+        log(`Setting rom path [${romPath}]`);
+        stringToUTF8(romPath, romPathPointer, 2048);
       }
 
       function updateRomList() {
@@ -805,9 +800,22 @@ canvas {
         select.add(option);
       }
 
+      async function uploadRom() {
+        const file = document.getElementById('rom-upload').files[0];
+        const filename = basename(file.name);
+        var path = fsPath + "/" + filename;
+        log(`Saving uploaded rom to [${path}]`);
+        var romContent = await file.arrayBuffer();
+        FS.writeFile(path, new DataView(romContent));
+        runSync(function() {
+          setRomPath(path);
+        });
+      }
+
       generateKeymap();
       addKeypadHandlers();
       fetchServerRoms();
+      addUploadHandler();
 
       var Module = {
         preRun: [],
