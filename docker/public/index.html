@@ -219,9 +219,9 @@ button.non-arrow {
   border: 0;
 }
 
-button.non-arrow .key::before { content: "und"; }
-button.non-arrow .labels::before { content: "und"; }
-button.non-arrow .labels::after { content: "und"; }
+button.non-arrow .key::before { content: "x"; }
+button.non-arrow .labels::before { content: "x"; }
+button.non-arrow .labels::after { content: "x"; }
 
 .ti85 #k64 .key::before { content: "F1"; }
 .ti85 #k64 .labels::before { content: "M1"; }
@@ -414,16 +414,6 @@ canvas {
   height: 100%;
 }
 
-#controls {
-  display: none;
-}
-#status {
-  display: none;
-}
-#output {
-  display: none;
-}
-
     </style>
   </head>
   <body>
@@ -433,14 +423,9 @@ canvas {
       <div class="emscripten">
         <progress value="0" max="100" id="progress" hidden=1></progress>
       </div>
-      <span id='controls'>
-        <span><input type="button" value="Fullscreen" onclick="Module.requestFullscreen(document.getElementById('pointerLock').checked, 
-                                                                                  document.getElementById('resize').checked)">
-        </span>
-      </span>
       <p>ROM Selection:</p>
       <select id="rom" onchange="javascript:romSelected()">
-        <option value="">Choose Server ROM</option>
+        <option value="">No Server ROMs Found</option>
       </select>
       <p>Load a ROM File: <input type="file" id="rom-upload" accept=".bin,.rom" /></p>
       <p>Emulator Log:</p>
@@ -452,8 +437,9 @@ canvas {
         <div class="branding">
           <span>Texas Instruments</span>
         </div>
-        <div class="model-info">
-          <span>TI-85</span>
+        <div><a href="https://github.com/marwatk/wasmwabbitemu">wasmWabbitEmu</a></div>
+        <div id='model' class="model-info">
+          <span>No ROM Loaded</span>
         </div>
       </div>
       <div class="lcd">
@@ -570,16 +556,16 @@ canvas {
 [[''],5,1],             [['1'],4,1],    [['2'],3,1],    [['3'],2,1], [['='],1,1],
 [['`'],5,0],            [['0'],4,0],    [['.'],3,0],    [['n'],2,0], [[Enter],1,0]];
       const models = {
-        0: "ti81",
-        1: "ti82",
-        2: "ti83",
-        3: "ti85",
-        4: "ti86",
-        5: "ti73",
-        6: "ti83p",
-        7: "ti83pse",
-        8: "ti84p",
-        9: "ti84pse",
+        0: "TI-81",
+        1: "TI-82",
+        2: "TI-83",
+        3: "TI-85",
+        4: "TI-86",
+        5: "TI-73",
+        6: "TI-83p",
+        7: "TI-83pse",
+        8: "TI-84p",
+        9: "TI-84pse",
       };
 
       function addKeypadHandlers() {
@@ -604,6 +590,7 @@ canvas {
       function calcLoaded(modelInt) {
         var rom = UTF8ToString(romPathPointer, 2048);
         log(`Calc loaded [${rom}]!`);
+        $('#model').text(models[modelInt]);
         $('#calc').removeClass().addClass(models[modelInt]);
         $("#menu").hide();
         log(`Setting last rom to [${rom}]`);
@@ -785,11 +772,11 @@ canvas {
       function updateRomList() {
         var select = $('#rom');
         select.empty();
+        let romCount = serverRoms.length + browserRoms.length;
         select.append($('<option>', {
           value: "",
-          text: 'Choose ROM'
+          text: romCount == 0 ? 'No preloaded ROMs found' : 'Choose ROM',
         }));
-
         serverRoms.sort();
         browserRoms.sort();
         for( i = 0; i < browserRoms.length; i++ ) {
