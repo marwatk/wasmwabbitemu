@@ -16,7 +16,6 @@ SDL_Renderer *renderer = NULL;      // Pointer for the renderer
 SDL_Window *window = NULL;      // Pointer for the window
 
 #define MAX_PATH_LEN 2048
-#define ROM_FILE "z.rom"
 #define LCD_HIGH  255
 
 char romPath[MAX_PATH_LEN];
@@ -48,7 +47,7 @@ bool WabbitemuApp::init() {
     calc_slot_free(lpCalc);
     BOOL loadedRom = FALSE;
     
-    if (rom_load(lpCalc, ROM_FILE)) {
+    if (rom_load(lpCalc, romPath)) {
       puts("Second load worked\n");
       loadedRom = TRUE;
     }

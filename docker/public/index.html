@@ -610,7 +610,7 @@ canvas {
         var romContent = await response.arrayBuffer();
         var path = fsPath + "/" + basename(url);
         log(`Saving rom to [${path}]`);
-        FS.writeFile(path, new DataView(romContent));
+        FS.writeFile(path, new Uint8Array(romContent));
         runSync(function() {
           setRomPath(path);
         });
@@ -799,13 +799,20 @@ canvas {
       async function uploadRom() {
         const file = document.getElementById('rom-upload').files[0];
         const filename = basename(file.name);
-        var path = fsPath + "/" + filename;
+        let path = fsPath + "/" + filename;
         log(`Saving uploaded rom to [${path}]`);
-        var romContent = await file.arrayBuffer();
-        FS.writeFile(path, new DataView(romContent));
-        runSync(function() {
-          setRomPath(path);
-        });
+        let reader = new FileReader();
+        reader.onload = () => {
+          let dv = new Uint8Array(reader.result);
+          FS.writeFile(path, dv);
+          runSync(function() {
+            setRomPath(path);
+          });
+        };
+        reader.onerror = (err) => {
+          log(`error uploading rom: ${err}`);
+        }
+        reader.readAsArrayBuffer(file);
       }
 
       generateKeymap();
