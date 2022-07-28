@@ -281,7 +281,7 @@ EM_BOOL loop(double time, void* userData) {
       romPath[0] = 0;
     }
     printf("Init succeeded\n");
-    EM_ASM(calcLoaded());
+    EM_ASM(calcLoaded($0), theCalc->model);
     initDone = true;
   }
   if (initDone) {
