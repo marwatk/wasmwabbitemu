@@ -7,7 +7,7 @@ It is based on a decent TI-8x emulator, Wabbitemu.
 
 ## Online demo
 
-http://marcuswatkins.net/wasmWabbitemu/
+https://marwatk.github.io/wasmwabbitemu/
 
 ## Building and running
 
