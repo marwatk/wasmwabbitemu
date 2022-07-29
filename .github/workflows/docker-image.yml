@@ -24,7 +24,7 @@ jobs:
     - name: Push the image
       run: docker push marwatk/wasmwabbitemu:latest
     - name: Extract the static files
-      run: docker run --rm -v docker/public:/tmp/public marwatk/wasmwabbitemu:latest cp -rf /public /tmp/public
+      run: docker run --rm -v $(pwd)/docker/public:/tmp/public marwatk/wasmwabbitemu:latest cp -rf /public /tmp/public
     - name: Deploy pages
       uses: JamesIves/github-pages-deploy-action@v4
       with:
