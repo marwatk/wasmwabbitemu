@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>wasmWabbitemu</title>
+    <link rel="stylesheet" href="wxWabbitemu.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+
+.alpha {
+  color: lightblue;
+}
+
+.second {
+  color: #FC0;
+}
+
+.button button.toggle-alpha {
+  background-color: lightblue;
+}
+
+.button button.toggle-second {
+  background-color: #FC0;
+  color: black;
+}
+
+    </style>
+  </head>
+  <body>
+    <div id="menu" class="menu">
+      <div class="spinner" id='spinner'></div>
+      <div class="emscripten" id="status">Downloading...</div>
+      <div class="emscripten">
+        <progress value="0" max="100" id="progress" hidden=1></progress>
+      </div>
+      <p>ROM Selection:</p>
+      <select id="rom" onchange="javascript:romSelected()">
+        <option value="">No Server ROMs Found</option>
+      </select>
+      <p>Load a ROM File: <input type="file" id="rom-upload" accept=".bin,.rom" /></p>
+      <p>Emulator Log:</p>
+      <textarea id="output" rows="8" readonly></textarea>
+    </div>
+    
+    <div id='calc' class=''>
+      <div class="title-bar">
+        <div class="branding">
+          <span>Texas Instruments</span>
+        </div>
+        <div><a href="https://github.com/marwatk/wasmwabbitemu">wasmWabbitEmu</a></div>
+        <div id='model' class="model-info">
+        </div>
+      </div>
+      <div class="lcd">
+        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+      </div>
+      <button id='k64' class='keypad non-arrow function'><div class='labels'></div><div class='key'></div></button>
+      <button id='k63' class='keypad non-arrow function'><div class='labels'></div><div class='key'></div></button>
+      <button id='k62' class='keypad non-arrow function'><div class='labels'></div><div class='key'></div></button>
+      <button id='k61' class='keypad non-arrow function'><div class='labels'></div><div class='key'></div></button>
+      <button id='k60' class='keypad non-arrow function'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k65' class='keypad non-arrow second'><div class='labels'></div><div class='key'></div></button>
+      <button id='k66' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k67' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <div class="arrow-buttons">
+        <button id='k03' class="keypad arrow-button arrow-up">▲</button>
+        <button id='k01' class="keypad arrow-button arrow-left">◀</button>
+        <button id='k02' class="keypad arrow-button arrow-right">▶</button>
+        <button id='k00' class="keypad arrow-button arrow-down">▼</button>
+      </div>
+
+      <button id='k57' class='keypad non-arrow alpha'><div class='labels'></div><div class='key'></div></button>
+      <button id='k47' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k37' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k56' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k46' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k36' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k26' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k16' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k55' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k45' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k35' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k25' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k15' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k54' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k44' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k34' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k24' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k14' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k53' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k43' class='keypad non-arrow number'><div class='labels'></div><div class='key'></div></button>
+      <button id='k33' class='keypad non-arrow number'><div class='labels'></div><div class='key'></div></button>
+      <button id='k23' class='keypad non-arrow number'><div class='labels'></div><div class='key'></div></button>
+      <button id='k13' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k52' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k42' class='keypad non-arrow number'><div class='labels'></div><div class='key'></div></button>
+      <button id='k32' class='keypad non-arrow number'><div class='labels'></div><div class='key'></div></button>
+      <button id='k22' class='keypad non-arrow number'><div class='labels'></div><div class='key'></div></button>
+      <button id='k12' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k51' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k41' class='keypad non-arrow number'><div class='labels'></div><div class='key'></div></button>
+      <button id='k31' class='keypad non-arrow number'><div class='labels'></div><div class='key'></div></button>
+      <button id='k21' class='keypad non-arrow number'><div class='labels'></div><div class='key'></div></button>
+      <button id='k11' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+
+      <button id='k50' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+      <button id='k40' class='keypad non-arrow number'><div class='labels'></div><div class='key'></div></button>
+      <button id='k30' class='keypad non-arrow number'><div class='labels'></div><div class='key'></div></button>
+      <button id='k20' class='keypad non-arrow number'><div class='labels'></div><div class='key'></div></button>
+      <button id='k10' class='keypad non-arrow'><div class='labels'></div><div class='key'></div></button>
+    </div>
+
+    <textarea id="output" rows="8"></textarea>
+
+    <script type='text/javascript'>
+      const fsPath = "/idbfs";
+      const lastRomFile = "lastrom.txt";
+      var romSet = false;
+      var romPathPointer = 0;
+      var calcInputs = [];
+      var browserRoms = [];
+      var serverRoms = [];
+      var statusElement = document.getElementById('status');
+      var progressElement = document.getElementById('progress');
+      var spinnerElement = document.getElementById('spinner');
+      
+      // Determined experimentally on a chromebook
+      // TODO: Use the javascript consts, though they seem to vary by OS?
+      const LShift = 1073742049;
+      const RShift = 1073742053;
+      const UpArrow = 1073741906;
+      const DownArrow = 1073741905;
+      const RightArrow = 1073741903;
+      const LeftArrow = 1073741904;
+      const Escape = 27;
+      const LCtrl = 1073742048;
+      const RCtrl = 1073742052;
+      const LAlt = 1073742050;
+      const RAlt = 1073742054;
+      const Backspace = 8;
+      const Enter = 13;
+      const Delete = 46;
+
+      var keyMap = {};
+      var reverseKeyMap = {};
+      const keys = [
+// [[Javascript keyCodes], Group, Bit]
+[['z'],6,4],            [['v'],6,3],    [['b'],6,2],    [['j'],6,1], [['k'],6,0], // Function keys
+                                                                       [[UpArrow],0,3],  
+[[LShift, RShift],6,5], [[Escape],6,6], [[LCtrl,RCtrl],6,7],   [[LeftArrow],0,1], [[RightArrow],0,2],
+[[LAlt,RAlt],5,7],      [['x'],4,7],    [[Delete],3,7],                [[DownArrow],0,0],  
+[['g'],5,6],            [['s'],4,6],    [['p'],3,6],    [['c'],2,6], [[Backspace],1,6],  
+[['l'],5,5],            [['i'],4,5],    [['o'],3,5],    [['t'],2,5], [['w'],1,5],  
+[['d'],5,4],            [['e'],4,4],    [['['],3,4],    [[']'],2,4], [['/'],1,4],  
+[['q'],5,3],            [['7'],4,3],    [['8'],3,3],    [['9'],2,3], [['*'],1,3],  
+[[','],5,2],            [['4'],4,2],    [['5'],3,2],    [['6'],2,2], [['-'],1,2],  
+[[''],5,1],             [['1'],4,1],    [['2'],3,1],    [['3'],2,1], [['='],1,1],
+[['`'],5,0],            [['0'],4,0],    [['.'],3,0],    [['n'],2,0], [[Enter],1,0]];
+      const models = {
+        0: "TI-81",
+        1: "TI-82",
+        2: "TI-83",
+        3: "TI-85",
+        4: "TI-86",
+        5: "TI-73",
+        6: "TI-83p",
+        7: "TI-83pse",
+        8: "TI-84p",
+        9: "TI-84pse",
+      };
+
+      function addKeypadHandlers() {
+        $("button.keypad")
+          .on("mousedown", { up: false }, keypadEvent)
+          .on("mouseup", { up: true }, keypadEvent);
+      }
+
+      function addUploadHandler() {
+        $("#rom-upload").on("change", uploadRom);
+      }
+
+      function basename(path) {
+        var ar = path.split(/[\\/]/);
+        var r = ar.pop();
+        if ( r == "" ) {
+          r = ar.pop();
+        }
+        return r;
+      }
+ 
+      function calcLoaded(modelInt) {
+        var rom = UTF8ToString(romPathPointer, 2048);
+        log(`Calc loaded [${rom}]!`);
+        $('#calc').removeClass().addClass(models[modelInt].replace("-", "").toLowerCase());
+        $("#menu").hide();
+        log(`Setting last rom to [${rom}]`);
+        FS.writeFile(fsPath + "/" + lastRomFile, rom);
+        runSync();
+      }
+
+      async function fetchAndLoadRom(url) {
+        var response = await fetch(url);
+        if (!response.ok) {
+          log("Error loading rom: " + response.statusText);
+          return;
+        }
+        var romContent = await response.arrayBuffer();
+        var path = fsPath + "/" + basename(url);
+        log(`Saving rom to [${path}]`);
+        FS.writeFile(path, new Uint8Array(romContent));
+        runSync(function() {
+          setRomPath(path);
+        });
+      }
+ 
+      async function fetchServerRoms() {
+        var response = await fetch("romlist.txt");
+        var i;
+        var roms;
+        var rom;
+        if (!response.ok) {
+          return;
+        }
+        const text = await response.text();
+        roms = text.split("\n");
+        for( i = 0; i < roms.length; i++ ) {
+          rom = roms[i];
+          if ( rom.length > 0 ) { 
+            serverRoms.push(rom);
+          }  
+        }
+        updateRomList();
+      }
+
+      function fsLoaded() {
+        var files = Object.keys(FS.lookupPath(fsPath).node.contents);
+        var file;
+        var lastRom = "";
+        var i;
+        var path;
+        for( i = 0; i < files.length; i++ ) {
+          file = files[i];
+          path = fsPath + "/" + file;
+          if (file == lastRomFile) {
+            lastRom = FS.readFile(path, { encoding: "utf8" });
+            log(`Lastrom file containted [${lastRom}]`);
+          }
+          else {
+            browserRoms.push(path);
+          }
+        }
+        for( i = 0; i < browserRoms.length; i++ ) {
+          if( lastRom == browserRoms[i] ) {
+            log("Last rom found in persistent storage, loading");
+            setRomPath(lastRom);
+          }
+        }
+        updateRomList();
+      }
+
+      function generateKeymap() {
+        var i;
+        var j;
+        var keyCode;
+        var keyInt;
+        var keyCharOrCode;
+        for ( i = 0; i < keys.length; i++ ) {
+          keys[i] = keys[i];
+          for ( j = 0; j < keys[i][0].length; j++ ) {
+            keyCharOrCode = keys[i][0][j];
+            keyCode = typeof keyCharOrCode == 'string' ? keyCharOrCode.charCodeAt(0) : keyCharOrCode;
+            if (keyMap[keyCode]) {
+              console.log(`Warning: keyCode ${keyCode} already assigned`);
+            }
+            keyInt = serializeKey(keys[i][1], keys[i][2]);
+            keyMap[keyCode] = keyInt;
+          }
+        }
+      }
+  
+      function keypadEvent(event) {
+        var id = event.currentTarget.id;
+        var keyInt = serializeKey(parseInt(id[1]), parseInt(id[2]), event.data.up);
+        calcInputs.push(keyInt);        
+      }
+ 
+      function log(msg) {
+        var element = document.getElementById('output');
+        console.log(msg);
+        if (element) {
+          element.value += msg + "\n";
+          element.scrollTop = element.scrollHeight; // focus on bottom
+        }
+      }
+
+      function loopJs() {
+        if (Module.syncing) {
+          return false;
+        }
+        return true;
+      }
+  
+      function mainJs() {
+        log("main() has started, Creating IDBFS filesystem");
+        Module.syncing = true;
+        FS.mkdir(fsPath);
+        FS.mount(IDBFS, {}, fsPath);
+        FS.syncfs(true, function (err) {
+          Module.syncing = false;
+          if ( err ) {
+            log("Error loading idbfs: " + err);
+          } else {
+            log("IDBFS filesystem loaded");
+            fsLoaded();
+          }
+        });
+      }
+
+      function mapKey(keyCode) {
+        return keyMap[keyCode];
+      }
+
+      function romSelected() {        
+        var rom = $("#rom").value();
+        if( rom == "" ) {
+          return;
+        }
+        if ( rom.startsWith("/") ) {
+          setRomPath(rom);
+          return;
+        }
+        fetchAndLoadRom(rom);
+      }
+ 
+      function runSync(cb) {
+        Module.syncing = true;
+        FS.syncfs(function (err) {
+          Module.syncing = false;
+          if ( err ) {
+            log("Error syncing idbfs: " + err);
+          } else {
+            log("IDBFS filesystem synced");
+            if ( cb ) {
+              cb();
+            }
+          }
+        });
+      }
+      
+      function serializeKey(group, bit, up) {
+        var keyInt = 0x20000 | (group << 8) | bit;
+        if ( up ) {
+          keyInt |= 0x10000;
+        }
+        return keyInt;
+      }
+
+      function setRomPathPointer(pointer) {
+        log(`Rom path pointer: ${pointer}`);
+        romPathPointer = pointer;
+      }
+
+      function setRomPath(romPath) {
+        if (romPathPointer == 0) {
+          log("Attempted to set romPath with zero romPathPointer!");
+          return;
+        }
+        log(`Setting rom path [${romPath}]`);
+        stringToUTF8(romPath, romPathPointer, 2048);
+      }
+
+      function updateRomList() {
+        var select = $('#rom');
+        select.empty();
+        let romCount = serverRoms.length + browserRoms.length;
+        select.append($('<option>', {
+          value: "",
+          text: romCount == 0 ? 'No preloaded ROMs found' : 'Choose ROM',
+        }));
+        serverRoms.sort();
+        browserRoms.sort();
+        for( i = 0; i < browserRoms.length; i++ ) {
+          select.append($('<option>', {
+            value: browserRoms[i],
+            text: basename(browserRoms[i]) + " (Loaded)",
+          }));
+        }
+        for( i = 0; i < serverRoms.length; i++ ) {
+          select.append($('<option>', {
+            value: serverRoms[i],
+            text: basename(serverRoms[i]) + " (Loaded)",
+          }));
+        }
+      }
+
+      async function uploadRom() {
+        const file = document.getElementById('rom-upload').files[0];
+        const filename = basename(file.name);
+        let path = fsPath + "/" + filename;
+        log(`Saving uploaded rom to [${path}]`);
+        let reader = new FileReader();
+        reader.onload = () => {
+          let dv = new Uint8Array(reader.result);
+          FS.writeFile(path, dv);
+          runSync(function() {
+            setRomPath(path);
+          });
+        };
+        reader.onerror = (err) => {
+          log(`error uploading rom: ${err}`);
+        }
+        reader.readAsArrayBuffer(file);
+      }
+
+      generateKeymap();
+      addKeypadHandlers();
+      fetchServerRoms();
+      addUploadHandler();
+
+      var Module = {
+        preRun: [],
+        postRun: [],
+        print: (function() {
+          var element = document.getElementById('output');
+          if (element) element.value = ''; // clear browser cache
+          return function(text) {
+            if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+            // These replacements are necessary if you render to raw HTML
+            //text = text.replace(/&/g, "&amp;");
+            //text = text.replace(/</g, "&lt;");
+            //text = text.replace(/>/g, "&gt;");
+            //text = text.replace('\n', '<br>', 'g');
+            console.log(text);
+            if (element) {
+              element.value += text + "\n";
+              element.scrollTop = element.scrollHeight; // focus on bottom
+            }
+          };
+        })(),
+        canvas: (function() {
+          var canvas = document.getElementById('canvas');
+
+          // As a default initial behavior, pop up an alert when webgl context is lost. To make your
+          // application robust, you may want to override this behavior before shipping!
+          // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
+          canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+
+          return canvas;
+        })(),
+        setStatus: function(text) {
+          if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+          if (text === Module.setStatus.last.text) return;
+          var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+          var now = Date.now();
+          if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+          Module.setStatus.last.time = now;
+          Module.setStatus.last.text = text;
+          if (m) {
+            text = m[1];
+            progressElement.value = parseInt(m[2])*100;
+            progressElement.max = parseInt(m[4])*100;
+            progressElement.hidden = false;
+            spinnerElement.hidden = false;
+          } else {
+            progressElement.value = null;
+            progressElement.max = null;
+            progressElement.hidden = true;
+            if (!text) spinnerElement.style.display = 'none';
+          }
+          statusElement.innerHTML = text;
+        },
+        totalDependencies: 0,
+        monitorRunDependencies: function(left) {
+          this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+        }
+      };
+      Module.setStatus('Downloading...');
+      window.onerror = function(event) {
+        // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
+        Module.setStatus('Exception thrown, see JavaScript console');
+        spinnerElement.style.display = 'none';
+        Module.setStatus = function(text) {
+          if (text) console.error('[post-exception status] ' + text);
+        };
+      };
+    </script>
+    <script async type="text/javascript" src="wxWabbitemu.js"></script>
+  </body>
+</html>
+
