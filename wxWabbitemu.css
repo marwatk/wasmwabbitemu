@@ -1,0 +1,683 @@
+@charset "UTF-8";
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  font-size: 3vmin;
+  font-family: arial;
+  margin: 0;
+  padding: none;
+}
+
+.emscripten {
+  padding-right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+div.emscripten {
+  text-align: center;
+}
+
+div.emscripten_border {
+  border: 1px solid black;
+}
+
+/* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+canvas.emscripten {
+  border: 0px none;
+  background-color: black;
+}
+
+@-webkit-keyframes rotation {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@-moz-keyframes rotation {
+  from {
+    -moz-transform: rotate(0deg);
+  }
+  to {
+    -moz-transform: rotate(360deg);
+  }
+}
+@-o-keyframes rotation {
+  from {
+    -o-transform: rotate(0deg);
+  }
+  to {
+    -o-transform: rotate(360deg);
+  }
+}
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spinner {
+  height: 30px;
+  width: 30px;
+  margin: 0;
+  margin-top: 20px;
+  margin-left: 20px;
+  display: inline-block;
+  vertical-align: top;
+  -webkit-animation: rotation 0.8s linear infinite;
+  -moz-animation: rotation 0.8s linear infinite;
+  -o-animation: rotation 0.8s linear infinite;
+  animation: rotation 0.8s linear infinite;
+  border-left: 5px solid rgb(235, 235, 235);
+  border-right: 5px solid rgb(235, 235, 235);
+  border-bottom: 5px solid rgb(235, 235, 235);
+  border-top: 5px solid rgb(120, 120, 120);
+  border-radius: 100%;
+  background-color: rgb(189, 215, 46);
+}
+
+#menu {
+  display: block;
+  position: fixed;
+  padding: 1em;
+  background-color: gray;
+  color: black;
+  top: 5%;
+  left: 5%;
+  right: 5%;
+  bottom: 20%;
+}
+
+#status {
+  display: block;
+  font-weight: bold;
+  color: black;
+}
+
+#menu p {
+  margin-top: 2em;
+}
+
+#progress {
+  height: 20px;
+  width: 300px;
+}
+
+#controls {
+  margin-top: 30px;
+  margin-right: 20px;
+}
+
+#output {
+  width: 100%;
+  height: 200px;
+  margin: 0 auto;
+  margin-top: 0px;
+  border-left: 0px;
+  border-right: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  display: block;
+  background-color: black;
+  color: white;
+  font-family: "Lucida Console", Monaco, monospace;
+  outline: none;
+}
+
+button.non-arrow .key::before {
+  content: "x";
+}
+
+button.non-arrow .labels::before {
+  content: "x";
+}
+
+button.non-arrow .labels::after {
+  content: "x";
+}
+
+#calc {
+  background-color: black;
+  max-width: 100vw;
+  max-height: 100vh;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 2px;
+  padding-bottom: 8vw;
+}
+#calc .title-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  color: white;
+  grid-column: 1/6;
+}
+#calc .model-info {
+  content: "No ROM Loaded";
+}
+#calc .lcd {
+  aspect-ratio: 60/40;
+  background-color: lightcoral;
+  grid-column: 1/6;
+}
+#calc canvas {
+  width: 100%;
+  height: 100%;
+}
+#calc button {
+  font-size: 3vmin;
+  width: 100%;
+}
+#calc button:active {
+  background-color: white;
+}
+#calc button:active .key {
+  background-color: red;
+}
+#calc button.arrow-button, #calc .button button.ten-key {
+  color: white;
+  background-color: grey;
+}
+#calc button.non-arrow {
+  display: block;
+  background-color: black;
+  border: 0;
+}
+#calc .arrow-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-column-end: span 2;
+  grid-row-end: span 2;
+}
+#calc .arrow-buttons button {
+  height: 100%;
+}
+#calc .arrow-buttons .arrow-down {
+  grid-column: 2;
+  grid-row: 3;
+}
+#calc .arrow-buttons .arrow-left {
+  grid-column: 1;
+  grid-row: 2;
+}
+#calc .arrow-buttons .arrow-right {
+  grid-column: 3;
+  grid-row: 2;
+}
+#calc .arrow-buttons .arrow-up {
+  grid-column: 2;
+  grid-row: 1;
+}
+#calc .key {
+  background-color: gray;
+  color: white;
+  border-radius: 0.8vh;
+  clear: both;
+  height: 60%;
+}
+#calc .labels {
+  display: block;
+  width: 100%;
+}
+#calc .labels::before {
+  color: #FC0;
+  float: left;
+  padding-left: 5px;
+}
+#calc .labels::after {
+  color: lightblue;
+  text-align: right;
+  float: right;
+  padding-right: 5px;
+}
+
+#calc.ti85 .model-info::before {
+  content: "TI-85";
+}
+#calc.ti85 .non-arrow .key {
+  background-color: black;
+  border-color: gray;
+  border-style: solid;
+  border-width: 1px;
+}
+#calc.ti85 .second .key {
+  background-color: #FC0;
+}
+#calc.ti85 .alpha .key {
+  background-color: lightblue;
+}
+#calc.ti85 .number .key {
+  background-color: gray;
+}
+#calc.ti85 button:active {
+  background-color: white;
+}
+#calc.ti85 button:active .key {
+  background-color: red;
+}
+#calc.ti85 #k64 .key::before {
+  content: "F1";
+}
+#calc.ti85 #k64 .labels::before {
+  content: "M1";
+}
+#calc.ti85 #k64 .labels::after {
+  content: "";
+}
+#calc.ti85 #k63 .key::before {
+  content: "F2";
+}
+#calc.ti85 #k63 .labels::before {
+  content: "M2";
+}
+#calc.ti85 #k63 .labels::after {
+  content: "";
+}
+#calc.ti85 #k62 .key::before {
+  content: "F3";
+}
+#calc.ti85 #k62 .labels::before {
+  content: "M3";
+}
+#calc.ti85 #k62 .labels::after {
+  content: "";
+}
+#calc.ti85 #k61 .key::before {
+  content: "F4";
+}
+#calc.ti85 #k61 .labels::before {
+  content: "M4";
+}
+#calc.ti85 #k61 .labels::after {
+  content: "";
+}
+#calc.ti85 #k60 .key::before {
+  content: "F5";
+}
+#calc.ti85 #k60 .labels::before {
+  content: "M5";
+}
+#calc.ti85 #k60 .labels::after {
+  content: "";
+}
+#calc.ti85 #k65 .key::before {
+  content: "2nd";
+}
+#calc.ti85 #k65 .labels::before {
+  content: "2nd";
+}
+#calc.ti85 #k65 .labels::after {
+  content: "";
+}
+#calc.ti85 #k66 .key::before {
+  content: "EXIT";
+}
+#calc.ti85 #k66 .labels::before {
+  content: "QUIT";
+}
+#calc.ti85 #k66 .labels::after {
+  content: "";
+}
+#calc.ti85 #k67 .key::before {
+  content: "MORE";
+}
+#calc.ti85 #k67 .labels::before {
+  content: "MODE";
+}
+#calc.ti85 #k67 .labels::after {
+  content: "";
+}
+#calc.ti85 #k57 .key::before {
+  content: "ALPHA";
+}
+#calc.ti85 #k57 .labels::before {
+  content: "alpha";
+}
+#calc.ti85 #k57 .labels::after {
+  content: "";
+}
+#calc.ti85 #k47 .key::before {
+  content: "x-VAR";
+}
+#calc.ti85 #k47 .labels::before {
+  content: "LINK";
+}
+#calc.ti85 #k47 .labels::after {
+  content: "x";
+}
+#calc.ti85 #k37 .key::before {
+  content: "DEL";
+}
+#calc.ti85 #k37 .labels::before {
+  content: "INS";
+}
+#calc.ti85 #k37 .labels::after {
+  content: "";
+}
+#calc.ti85 #k56 .key::before {
+  content: "GRAPH";
+}
+#calc.ti85 #k56 .labels::before {
+  content: "SOLVER";
+}
+#calc.ti85 #k56 .labels::after {
+  content: "";
+}
+#calc.ti85 #k46 .key::before {
+  content: "STAT";
+}
+#calc.ti85 #k46 .labels::before {
+  content: "SIMULT";
+}
+#calc.ti85 #k46 .labels::after {
+  content: "";
+}
+#calc.ti85 #k36 .key::before {
+  content: "PRGM";
+}
+#calc.ti85 #k36 .labels::before {
+  content: "POLY";
+}
+#calc.ti85 #k36 .labels::after {
+  content: "";
+}
+#calc.ti85 #k26 .key::before {
+  content: "CUSTOM";
+}
+#calc.ti85 #k26 .labels::before {
+  content: "CATALOG";
+}
+#calc.ti85 #k26 .labels::after {
+  content: "";
+}
+#calc.ti85 #k16 .key::before {
+  content: "CLEAR";
+}
+#calc.ti85 #k16 .labels::before {
+  content: "TOLER";
+}
+#calc.ti85 #k16 .labels::after {
+  content: "";
+}
+#calc.ti85 #k55 .key::before {
+  content: "LOG";
+}
+#calc.ti85 #k55 .labels::before {
+  content: "10ˣ";
+}
+#calc.ti85 #k55 .labels::after {
+  content: "A";
+}
+#calc.ti85 #k45 .key::before {
+  content: "SIN";
+}
+#calc.ti85 #k45 .labels::before {
+  content: "SIN⁻¹";
+}
+#calc.ti85 #k45 .labels::after {
+  content: "B";
+}
+#calc.ti85 #k35 .key::before {
+  content: "COS";
+}
+#calc.ti85 #k35 .labels::before {
+  content: "COS⁻¹";
+}
+#calc.ti85 #k35 .labels::after {
+  content: "C";
+}
+#calc.ti85 #k25 .key::before {
+  content: "TAN";
+}
+#calc.ti85 #k25 .labels::before {
+  content: "TAN⁻¹";
+}
+#calc.ti85 #k25 .labels::after {
+  content: "D";
+}
+#calc.ti85 #k15 .key::before {
+  content: "^";
+}
+#calc.ti85 #k15 .labels::before {
+  content: "π";
+}
+#calc.ti85 #k15 .labels::after {
+  content: "E";
+}
+#calc.ti85 #k54 .key::before {
+  content: "LN";
+}
+#calc.ti85 #k54 .labels::before {
+  content: "eˣ";
+}
+#calc.ti85 #k54 .labels::after {
+  content: "F";
+}
+#calc.ti85 #k44 .key::before {
+  content: "EE";
+}
+#calc.ti85 #k44 .labels::before {
+  content: "x⁻¹";
+}
+#calc.ti85 #k44 .labels::after {
+  content: "G";
+}
+#calc.ti85 #k34 .key::before {
+  content: "(";
+}
+#calc.ti85 #k34 .labels::before {
+  content: "[";
+}
+#calc.ti85 #k34 .labels::after {
+  content: "H";
+}
+#calc.ti85 #k24 .key::before {
+  content: ")";
+}
+#calc.ti85 #k24 .labels::before {
+  content: "]";
+}
+#calc.ti85 #k24 .labels::after {
+  content: "I";
+}
+#calc.ti85 #k14 .key::before {
+  content: "÷";
+}
+#calc.ti85 #k14 .labels::before {
+  content: "CALC";
+}
+#calc.ti85 #k14 .labels::after {
+  content: "J";
+}
+#calc.ti85 #k53 .key::before {
+  content: "x²";
+}
+#calc.ti85 #k53 .labels::before {
+  content: "√";
+}
+#calc.ti85 #k53 .labels::after {
+  content: "K";
+}
+#calc.ti85 #k43 .key::before {
+  content: "7";
+}
+#calc.ti85 #k43 .labels::before {
+  content: "MATRX";
+}
+#calc.ti85 #k43 .labels::after {
+  content: "L";
+}
+#calc.ti85 #k33 .key::before {
+  content: "8";
+}
+#calc.ti85 #k33 .labels::before {
+  content: "VECTR";
+}
+#calc.ti85 #k33 .labels::after {
+  content: "M";
+}
+#calc.ti85 #k23 .key::before {
+  content: "9";
+}
+#calc.ti85 #k23 .labels::before {
+  content: "CPLX";
+}
+#calc.ti85 #k23 .labels::after {
+  content: "N";
+}
+#calc.ti85 #k13 .key::before {
+  content: "x";
+}
+#calc.ti85 #k13 .labels::before {
+  content: "MATH";
+}
+#calc.ti85 #k13 .labels::after {
+  content: "O";
+}
+#calc.ti85 #k52 .key::before {
+  content: ",";
+}
+#calc.ti85 #k52 .labels::before {
+  content: "∠";
+}
+#calc.ti85 #k52 .labels::after {
+  content: "P";
+}
+#calc.ti85 #k42 .key::before {
+  content: "4";
+}
+#calc.ti85 #k42 .labels::before {
+  content: "CONS";
+}
+#calc.ti85 #k42 .labels::after {
+  content: "Q";
+}
+#calc.ti85 #k32 .key::before {
+  content: "5";
+}
+#calc.ti85 #k32 .labels::before {
+  content: "CONV";
+}
+#calc.ti85 #k32 .labels::after {
+  content: "R";
+}
+#calc.ti85 #k22 .key::before {
+  content: "6";
+}
+#calc.ti85 #k22 .labels::before {
+  content: "STRNG";
+}
+#calc.ti85 #k22 .labels::after {
+  content: "S";
+}
+#calc.ti85 #k12 .key::before {
+  content: "-";
+}
+#calc.ti85 #k12 .labels::before {
+  content: "LIST";
+}
+#calc.ti85 #k12 .labels::after {
+  content: "T";
+}
+#calc.ti85 #k51 .key::before {
+  content: "STO▶";
+}
+#calc.ti85 #k51 .labels::before {
+  content: "RCL";
+}
+#calc.ti85 #k51 .labels::after {
+  content: "=";
+}
+#calc.ti85 #k41 .key::before {
+  content: "1";
+}
+#calc.ti85 #k41 .labels::before {
+  content: "BASE";
+}
+#calc.ti85 #k41 .labels::after {
+  content: "U";
+}
+#calc.ti85 #k31 .key::before {
+  content: "2";
+}
+#calc.ti85 #k31 .labels::before {
+  content: "TEST";
+}
+#calc.ti85 #k31 .labels::after {
+  content: "V";
+}
+#calc.ti85 #k21 .key::before {
+  content: "3";
+}
+#calc.ti85 #k21 .labels::before {
+  content: "VARS";
+}
+#calc.ti85 #k21 .labels::after {
+  content: "W";
+}
+#calc.ti85 #k11 .key::before {
+  content: "+";
+}
+#calc.ti85 #k11 .labels::before {
+  content: "MEM";
+}
+#calc.ti85 #k11 .labels::after {
+  content: "X";
+}
+#calc.ti85 #k50 .key::before {
+  content: "ON";
+}
+#calc.ti85 #k50 .labels::before {
+  content: "OFF";
+}
+#calc.ti85 #k50 .labels::after {
+  content: "";
+}
+#calc.ti85 #k40 .key::before {
+  content: "0";
+}
+#calc.ti85 #k40 .labels::before {
+  content: "CHAR";
+}
+#calc.ti85 #k40 .labels::after {
+  content: "Y";
+}
+#calc.ti85 #k30 .key::before {
+  content: ".";
+}
+#calc.ti85 #k30 .labels::before {
+  content: ":";
+}
+#calc.ti85 #k30 .labels::after {
+  content: "Z";
+}
+#calc.ti85 #k20 .key::before {
+  content: "(-)";
+}
+#calc.ti85 #k20 .labels::before {
+  content: "ANS";
+}
+#calc.ti85 #k20 .labels::after {
+  content: "˽";
+}
+#calc.ti85 #k10 .key::before {
+  content: "ENTER";
+}
+#calc.ti85 #k10 .labels::before {
+  content: "ENTRY";
+}
+#calc.ti85 #k10 .labels::after {
+  content: "";
+}
+
+/*# sourceMappingURL=wxWabbitemu.css.map */
