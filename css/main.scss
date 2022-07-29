@@ -256,6 +256,14 @@ button.non-arrow .labels::after { content: "x"; }
     border-width: 1px;
   }
 
+  .second .key {
+    background-color: $second-color;
+  }
+
+  .alpha .key {
+    background-color: $alpha-color;
+  }
+
   .number .key {
     background-color: gray;
   }
