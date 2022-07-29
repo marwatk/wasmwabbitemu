@@ -21,5 +21,11 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag marwatk/wasmwabbitemu:latest
-    - name: Build the Docker image
+    - name: Push the image
       run: docker push marwatk/wasmwabbitemu:latest
+    - name: Extract the static files
+      run: docker run --rm -v docker/public:/tmp/public marwatk/wasmwabbitemu:latest cp -rf /public /tmp/public
+    - name: Deploy pages
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: docker/public
