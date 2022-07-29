@@ -31,10 +31,19 @@ ENV EMSDK=/opt/emsdk
 ENV EM_CONFIG=/opt/emsdk/.emscripten
 ENV EMSDK_NODE=/opt/emsdk/node/14.18.2_64bit/bin/node
 
-WORKDIR /opt/src
-COPY . /opt/src/
+RUN npm install -g sass
 
-# TODO: This attempts to download a precompiled sdl2 which should be 
+COPY build/ /opt/src/build/
+COPY core/ /opt/src/core/
+COPY gui /opt/src/gui/
+COPY hardware/ /opt/src/hardware/
+COPY interface/ /opt/src/interface/
+COPY utilities/ /opt/src/utilities/
+COPY Makefile stdafx.h /opt/src/
+
+WORKDIR /opt/src
+
+# TODO: This downloads a precompiled sdl2 which should be 
 # embedded with a fixed version instead.
 RUN set -ex; \
     env; \
@@ -42,6 +51,12 @@ RUN set -ex; \
     emmake make -n; \
     emmake make -j8; \
     : ;
+
+COPY css/ /opt/src/css/
+
+WORKDIR /opt/src/css
+
+RUN sass *.scss /opt/root/public/wxWabbitemu.css
 
 COPY docker/ /opt/root/
 
