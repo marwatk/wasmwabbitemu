@@ -4,7 +4,6 @@
 #include "calc.h"
 #include "sound.h"
 #include "link.h"
-#include "gif.h"
 
 
 

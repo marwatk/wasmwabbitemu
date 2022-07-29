@@ -6,7 +6,6 @@
 #include "link.h"
 #include "calc.h"
 #include "83psehw.h"
-#include "fileutilities.h"
 
 extern int def(FILE *, FILE *, int);
 extern int inf(FILE *, FILE *);

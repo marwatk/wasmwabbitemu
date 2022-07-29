@@ -1,148 +1,40 @@
-wxWabbitemu
-============
+# wasmWabbitemu
 
-What is wxWabbitemu?
----------------------
-wxWabbitemu is a TI-8x emulator that uses the wxWidgets toolkit.
+## What is wasmWabbitemu?
+
+wasmWabbitemu is port of the wxWabbitemu a TI-8x emulator to the web.
 It is based on a decent TI-8x emulator, Wabbitemu.
-Hence the name: wxWabbitemu!
 
-It is designed to mainly run on Linux, but it can be run on other
-platforms as well.
+## Online demo
 
-wxWabbitemu supports loading any TI-8x variables, programs, apps, etc.
-It also supports loading and saving calculator states, capturing
-screenshots, debugging programs, and much more!
+http://marcuswatkins.net/wasmWabbitemu/
 
-wxWabbitemu History
---------------------
-This project was originally started by [Albert Huang (alberthdev)][albert]
-as an attempt to port a good TI-8x emulator to Linux.
+## Building and running
 
-(At the time, there was TilEm, a GTK+ TI-8X emulator, but it was buggy,
-slow, and rarely updated.**)
+Building currently requires docker. After docker is installed simply run `devhtml.sh` to build and start a simple webserver:
 
-Thankfully, a Wabbitemu developer, [Chris Shappel (Buckeye)][buckeye],
-joined in to do most of the porting. Later, [David Gomes][dgomes] joined
-development and helped develop the GUI.
+```bash
+./devhtml.sh
+```
 
-Nowadays, these contributers are part of the project:
+You can set optional environment variables for `PORT`, `CONTAINER_NAME` and `IMAGE_NAME` if needed.
 
- * [Jon "Jonimus" Storm][jonimus]
- * [geekboy][geekboy]
+Once started visit http://127.0.0.1:8081/ in a browser and load a ROM.
 
-** TilEm2:
+## Extracting static content
 
-At the time of writing, TilEm2, written by new developers
-Thibault "contra-sh" Duponchelle and Benjamin "FloppusMaximus" Moody,
-was released.
+If you'd prefer to run under a pre-existing webserver copy the `/public` folder out of the docker image.
 
-This version sports new emulation code, skinning support, and many
-improvements. If you find that wxWabbitemu is causing you too many
-problems, development/bug fixes are too slow, and/or you want to play
-with something new, give their emulator a try!
+```bash
+docker cp wabbit /public /my/webserver/htdocs/
+```
 
-http://lpg.ticalc.org/prj_tilem/
+## Status
 
-Installing wxWabbitemu
-----------------------
-wxWabbitemu can be found in the [eeems-linux](https://repo.eeems.codes/) pacman repository for arch based systems. Otherwise you will need to build it from source.
+Currently the only skin is a TI-85, but this can be easily extended by editing the CSS (keymaps and colors are pure CSS).
 
-Building wxWabbitemu
----------------------
-You need the following:
+## License
 
-  * A working C compiler. This includes, but is not limited to,
-    GCC and Clang.
-
-  * The wxWidgets development files. Basically, the headers and linking
-    libraries for wxWidgets. And of course, the wxWidgets library
-    itself.
-
-  * The GNU Make program. This program will build wxWabbitemu for you.
-    BSD make might work as well, but no guarantees.
-
-In all of the commands that you are instructed to type in, you should
-follow each command with pressing the return key.
-
-**Install Dependencies:**
-
-  * Debian, Ubuntu, Mint Linux, and friends:
-    
-    Run:
-    
-        sudo apt-get update && sudo apt-get upgrade
-    
-    Reboot if necessary.
-    
-    Then open a terminal again (if you rebooted), and type:
-    
-        # If libwxgtk3.0-dev isn't available, try libwxgtk2.8-dev.
-        # 2.8 is available on older distros, while 3.0 is available
-        # on more recent releases.
-        # Also, on later Ubuntu releases you will need to use libgtk3.0-gtk3-dev
-        sudo apt-get install build-essential libwxgtk3.0-dev
-
-  * Fedora, RHEL, and friends:
-    
-    Run:
-    
-        su -c "yum update"
-    
-    Reboot if necessary. 
-    
-    Then open a terminal again (if you rebooted), and type:
-    
-        su -c "yum install gcc gcc-c++ make wxGTK wxGTK-devel"
-
-Once you have installed the dependencies, you can go ahead and
-build wxWabbitemu!
-
-**Build wxWabbitemu:**
-
-In a terminal type:
-
-    make
-
-**Run wxWabbitemu:**
-
-To run it, type:
-
-    ./bin/wxWabbitemu
-
-Note, though, that wxwabbitemu is a portable file and it can be copied
-to anywhere in your computer and ran from any location.
-
-**Install wxWabbitemu:**
-
-To install, you can type:
-
-    make install
-
-Make sure you do this as root.
-
-**Notes:**
-
-If you want to build on another platform, or use a different build
-system, you can use premake to generate a different file! In the premake
-directory, run the premake program (with the options you want) to create
-files that can build wxWabbitemu!
-
-(If you're running Linux x86, we've included the premake4 binary.)
-
-For more information and/or building instructions, visit the
-Building page on our website:
-
-https://github.com/alberthdev/wxwabbitemu/wiki/Building
-
-The End
---------
-That's it! We hope you enjoy wxWabbitemu! Should it fail to do
-something, or crash, please help us by reporting bugs in our 
-issue tracker, located at https://github.com/alberthdev/wxwabbitemu/issues.
-
-License
---------
 See [LICENSE](License)
 
 [albert]: https://github.com/alberthdev
@@ -150,3 +42,4 @@ See [LICENSE](License)
 [dgomes]: https://github.com/davidgomes
 [jonimus]: https://github.com/Jonimoose
 [geekboy]: https://github.com/geekbozu
+[marwatk]: https://github.com/marwatk

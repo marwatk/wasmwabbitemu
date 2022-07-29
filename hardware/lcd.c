@@ -2,7 +2,6 @@
 
 #include "lcd.h"
 #include "83psehw.h"
-#include "gifhandle.h"
 #ifdef WINVER
 #include "registry.h"
 #endif

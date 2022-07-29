@@ -2,7 +2,6 @@
 
 #include "var.h"
 #include "calc.h"
-#include "fileutilities.h"
 #ifdef _WINDOWS
 #include "miniunz.h"
 #endif
@@ -648,18 +647,17 @@ TIFILE_t* newimportvar(LPCTSTR filePath, BOOL only_check_header) {
 	
 	TCHAR extension[5] = _T("");
 	const TCHAR *pext = _tcsrchr(filePath, '.');
+	printf("pext: %s\n", pext);
 	if (pext != NULL)
 	{
-#ifdef _WINDOWS
-		StringCbCopy(extension, sizeof(extension), pext);
-#else
 		_tcscpy(extension, pext);
-#endif
 	}
 
 	tifile = InitTiFile();
-	if (tifile == NULL)
+	if (tifile == NULL) {
+		puts("InitTiFile returned null\n");
 		return NULL;
+	}
 
 	if (!_tcsicmp(extension, _T(".lab"))) {
 		tifile->type = LABEL_TYPE;
@@ -671,22 +669,11 @@ TIFILE_t* newimportvar(LPCTSTR filePath, BOOL only_check_header) {
 		return tifile;
 	}
 
-#ifdef _WINDOWS
-	if (!_tcsicmp(extension, _T(".tig")) || !_tcsicmp(extension, _T(".zip")) ) {
-		tifile->type = ZIP_TYPE;
-		if (!only_check_header) {
-			ImportZipFile(filePath, tifile);
-		}
-		return tifile;
-	}
-#endif
-#ifdef WINVER
-	_tfopen_s(&infile, filePath, _T("rb"));
-#else
-	infile = fopen(wxFNCONV(filePath), "rb");
-#endif
-	if (infile == NULL) 
+	infile = fopen(filePath, "rb");
+	if (infile == NULL) {
+		printf("fopen [%s] returned null\n", filePath);
 		return FreeTiFile(tifile);
+	}
 
 	ReadTiFileHeader(infile, tifile);
 	//the last part is to make sure we don't allow files that cant be imported but

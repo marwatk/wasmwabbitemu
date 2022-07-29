@@ -5,7 +5,6 @@
 #include "coretypes.h"
 
 #ifdef WXVER
-#include <wx/frame.h>
 #endif
 #include "core.h"
 #include "lcd.h"
@@ -15,7 +14,6 @@
 #ifdef _WINDOWS
 #include "Wabbitemu_h.h"
 #include "sound.h"
-#include "DropTarget.h"
 #include "dbbreakpoints.h"
 #endif
 
@@ -73,7 +71,6 @@ typedef struct tagCALC {
 #endif
 
 #ifdef WINVER
-	CDropTarget *pDropTarget;
 	HWND hwndFrame;
 	HWND hwndLCD;
 	HWND hwndDetachedFrame;
@@ -101,13 +98,9 @@ typedef struct tagCALC {
 	HDC hdcButtons;
 	HDC hdcKeymap;
 #elif WXVER
-	wxImage calcSkin;
-	wxImage keymap;
 	int scale;
 	bool SkinEnabled;
 	bool bCutout;
-	wxSize SkinSize;
-	wxRect LCDRect;
 	clock_t sb_refresh;
 	bool bCustomSkin;
 	char skin_path[256];

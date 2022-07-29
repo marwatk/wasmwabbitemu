@@ -1,8 +1,16 @@
 #include "stdafx.h"
 #include "gui.h"
 #include "calc.h"
-#include <wx/config.h>
 
+#include <SDL.h>
+
+typedef struct js_key {
+	bool up;
+	int group;
+	int bit;
+} js_key;
+
+void jsKey(bool up, int group, int bit);
 
 #define MAX_FILES 255
 typedef struct ParsedCmdArgs
@@ -20,25 +28,25 @@ typedef struct ParsedCmdArgs
 	BOOL force_focus;
 } ParsedCmdArgs_t;
 
-
-class WabbitemuApp: public wxApp
+class WabbitemuApp
 {
-private:
+public:
+ 	void keyDown(int keycode);
+	void keyUp(int keycode);
+ 	void keyDown(int group, int bit);
+	void keyUp(int group, int bit);
+	void FinalizeButtons();
+	
+	bool init();
+	int exit();
+	void tick();
+	void handleEvents();
+
 	virtual bool OnInit();
 	virtual int OnExit();
-	void OnTimer(wxTimerEvent& event);
 	void getTimer(int slot);
-	void LoadSettings(LPCALC lpCalc);
-	void SaveSettings(LPCALC lpCalc);
-	wxConfigBase *settingsConfig;
-	wxTimer *timer;
+	void render();
 	unsigned GetTickCount();
-	
-	ParsedCmdArgs_t parsedArgs;
-	void ParseCommandLineArgs();
-	void LoadCommandlineFiles(INT_PTR,  void (*load_callback)(INT_PTR, LPTSTR, SEND_FLAG));
-public:
-	static BOOL DoRomWizard();
 };
 
 void LoadToLPCALC(INT_PTR lParam, LPTSTR filePath, SEND_FLAG sendLoc);

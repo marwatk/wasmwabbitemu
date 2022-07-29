@@ -22,14 +22,13 @@ typedef struct KEYPROG {
 #define VKF_LBRACKET 0xDB
 #define VKF_RBRACKET 0xDD
 #define VKF_QUOTE	0xDE
-#define WXK_LSHIFT WXK_SPECIAL20+1
-#define WXK_RSHIFT WXK_LSHIFT+1
 
 
 keypad_t *keypad_init(CPU_t*);
 void keypad(CPU_t *, device_t *);
 
-keyprog_t *keypad_key_press(CPU_t*, unsigned int vk, BOOL *changed = NULL);
+keyprog_t *keypad_map_key(CPU_t *cpu, unsigned int vk);
+keyprog_t *keypad_key_press(CPU_t*, unsigned int vk);
 keyprog_t *keypad_key_release(CPU_t*, unsigned int vk);
 void keypad_press(CPU_t *cpu, int group, int bit);
 void keypad_release(CPU_t *cpu, int group, int bit);
